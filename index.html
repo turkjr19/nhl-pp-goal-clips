@@ -103,6 +103,77 @@ header {
   font-weight: bold;
 }
 
+/* SEARCH */
+
+.search-panel {
+  background: white;
+  padding: 18px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.06);
+}
+
+.search-label {
+  display: block;
+  color: var(--navy);
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.search-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-controls input,
+.search-controls select {
+  padding: 12px;
+  border: 1px solid #CBD5E1;
+  border-radius: 5px;
+  font-size: 14px;
+  background: white;
+  color: var(--text);
+}
+
+.search-controls input {
+  flex: 1;
+  min-width: 0;
+}
+
+.search-controls select {
+  min-width: 155px;
+}
+
+.search-controls input:focus,
+.search-controls select:focus {
+  outline: 2px solid var(--blue);
+  border-color: var(--blue);
+}
+
+.clear-button {
+  background: var(--navy);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 12px 18px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.clear-button:hover {
+  background: var(--orange);
+}
+
+.search-help {
+  color: #66768A;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
 /* TABLE */
 
 .table-card {
@@ -221,7 +292,6 @@ footer span {
 
   .header-title h1 {
     font-size: 19px;
-    color: var(--navy);
     letter-spacing: 1px;
   }
 
@@ -239,6 +309,18 @@ footer span {
     font-size: 17px;
   }
 
+  .search-controls {
+    flex-wrap: wrap;
+  }
+
+  .search-controls input {
+    flex-basis: 100%;
+  }
+
+  .search-controls select {
+    flex: 1;
+  }
+
   th, td {
     padding: 12px 9px;
     font-size: 12px;
@@ -254,6 +336,8 @@ footer span {
 </head>
 
 <body>
+
+<!-- HEADER -->
 
 <header>
 
@@ -278,6 +362,9 @@ footer span {
 
 </header>
 
+
+<!-- MAIN CONTENT -->
+
 <main class="container">
 
   <div class="section-heading">
@@ -290,9 +377,54 @@ footer span {
 
   </div>
 
+
+  <!-- TEAM SEARCH -->
+
+  <div class="search-panel">
+
+    <label class="search-label" for="teamSearch">
+      SEARCH BY NHL TEAM
+    </label>
+
+    <div class="search-controls">
+
+      <input
+        type="text"
+        id="teamSearch"
+        placeholder="Enter team abbreviation (e.g. TOR)"
+        autocomplete="off"
+      >
+
+      <select id="teamFilter">
+        <option value="both">PP or PK Team</option>
+        <option value="pp">PP Team only</option>
+        <option value="pk">PK Team only</option>
+      </select>
+
+      <button
+        class="clear-button"
+        id="clearSearch"
+        type="button"
+      >
+        CLEAR
+      </button>
+
+    </div>
+
+    <div class="search-help">
+      Search by team abbreviation. Choose whether the team scored
+      on the power play or allowed the goal while on the penalty kill.
+    </div>
+
+  </div>
+
+
   <div id="status">
     Loading clips...
   </div>
+
+
+  <!-- CLIP TABLE -->
 
   <div class="table-card">
 
@@ -315,6 +447,9 @@ footer span {
 
 </main>
 
+
+<!-- FOOTER -->
+
 <footer>
 
   <span>ONTARIO TECH RIDGEBACKS</span>
@@ -325,12 +460,235 @@ footer span {
 
 </footer>
 
+
+<!-- CSV DATA AND SEARCH -->
+
 <script>
+
+let allClips = [];
+
+// --------------------------------------------------
+// CSV PARSER
+// --------------------------------------------------
+
+function parseCSVLine(line) {
+
+  const result = [];
+  let value = "";
+  let quoted = false;
+
+  for (let i = 0; i < line.length; i++) {
+
+    const char = line[i];
+
+    if (char === '"') {
+
+      if (quoted && line[i + 1] === '"') {
+        value += '"';
+        i++;
+      } else {
+        quoted = !quoted;
+      }
+
+    } else if (char === "," && !quoted) {
+
+      result.push(value);
+      value = "";
+
+    } else {
+
+      value += char;
+
+    }
+
+  }
+
+  result.push(value);
+
+  return result;
+}
+
+
+// --------------------------------------------------
+// IDENTIFY OPPOSING TEAM
+// --------------------------------------------------
+
+function getOpponentTeam(matchup, scoringTeam) {
+
+  if (!matchup || !scoringTeam) {
+    return "";
+  }
+
+  const teams = matchup.split(
+    /\s+(?:@|vs\.?|v\.?|at|-)\s+/i
+  );
+
+  if (teams.length !== 2) {
+    return "";
+  }
+
+  const firstTeam = teams[0].trim();
+  const secondTeam = teams[1].trim();
+
+  const normalize = value =>
+    value.trim().toUpperCase().replace(/\./g, "");
+
+  const scoring = normalize(scoringTeam);
+
+  if (normalize(firstTeam) === scoring) {
+    return secondTeam;
+  }
+
+  if (normalize(secondTeam) === scoring) {
+    return firstTeam;
+  }
+
+  return "";
+}
+
+
+// --------------------------------------------------
+// DISPLAY FILTERED CLIPS
+// --------------------------------------------------
+
+function displayClips() {
+
+  const tbody = document.getElementById("clips");
+  const count = document.getElementById("count");
+  const status = document.getElementById("status");
+
+  const search = document
+    .getElementById("teamSearch")
+    .value.trim()
+    .toUpperCase();
+
+  const filter = document
+    .getElementById("teamFilter")
+    .value;
+
+  // Filter clips by PP or PK team
+  const filteredClips = allClips.filter(row => {
+
+    if (!search) {
+      return true;
+    }
+
+    const ppTeam = (row.team || "").toUpperCase();
+    const pkTeam = (row.pk_team || "").toUpperCase();
+
+    if (filter === "pp") {
+      return ppTeam.includes(search);
+    }
+
+    if (filter === "pk") {
+      return pkTeam.includes(search);
+    }
+
+    return (
+      ppTeam.includes(search) ||
+      pkTeam.includes(search)
+    );
+
+  });
+
+  tbody.innerHTML = "";
+
+  // No results
+  if (filteredClips.length === 0) {
+
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+
+    td.colSpan = 4;
+    td.className = "empty";
+    td.textContent = "No clips found for this search.";
+
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+
+    count.textContent = "0 CLIPS";
+
+    status.textContent =
+      "Try another team abbreviation or filter.";
+
+    return;
+  }
+
+  // Display results
+  filteredClips.forEach(row => {
+
+    const tr = document.createElement("tr");
+
+    // Game date
+    const date = document.createElement("td");
+
+    date.className = "game-date";
+    date.textContent = row.game_date;
+
+    // PP team
+    const pp = document.createElement("td");
+
+    pp.className = "pp-team";
+    pp.textContent = row.team || "";
+
+    // PK team
+    const pk = document.createElement("td");
+
+    pk.className = "pk-team";
+    pk.textContent = row.pk_team || "";
+
+    // Video link
+    const clip = document.createElement("td");
+
+    if (row.clip_url) {
+
+      const link = document.createElement("a");
+
+      link.href = row.clip_url;
+      link.textContent = "WATCH CLIP";
+      link.className = "watch-button";
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+
+      clip.appendChild(link);
+
+    } else {
+
+      clip.textContent = "Unavailable";
+
+    }
+
+    tr.append(date, pp, pk, clip);
+
+    tbody.appendChild(tr);
+
+  });
+
+  count.textContent =
+    filteredClips.length + " OF " + allClips.length + " CLIPS";
+
+  if (search) {
+
+    status.textContent =
+      "Showing clips matching " + search;
+
+  } else {
+
+    status.textContent =
+      "Showing all available power-play goal clips";
+
+  }
+
+}
+
+
+// --------------------------------------------------
+// LOAD CSV
+// --------------------------------------------------
 
 async function loadClips() {
 
   const status = document.getElementById("status");
-  const tbody = document.getElementById("clips");
   const count = document.getElementById("count");
 
   try {
@@ -345,44 +703,6 @@ async function loadClips() {
 
     const csv = await response.text();
 
-    // Parse CSV including quoted fields
-    function parseCSVLine(line) {
-
-      const result = [];
-      let value = "";
-      let quoted = false;
-
-      for (let i = 0; i < line.length; i++) {
-
-        const char = line[i];
-
-        if (char === '"') {
-
-          if (quoted && line[i + 1] === '"') {
-            value += '"';
-            i++;
-          } else {
-            quoted = !quoted;
-          }
-
-        } else if (char === "," && !quoted) {
-
-          result.push(value);
-          value = "";
-
-        } else {
-
-          value += char;
-
-        }
-
-      }
-
-      result.push(value);
-
-      return result;
-    }
-
     const lines = csv.trim().split(/\r?\n/);
 
     if (lines.length <= 1) {
@@ -395,118 +715,35 @@ async function loadClips() {
 
     const headers = parseCSVLine(lines[0]);
 
-    const rows = lines.slice(1)
+    allClips = lines.slice(1)
       .filter(line => line.trim() !== "")
       .map(line => {
 
         const values = parseCSVLine(line);
 
-        return Object.fromEntries(
+        const row = Object.fromEntries(
           headers.map((header, i) => [
             header,
             values[i] || ""
           ])
         );
 
+        // Calculate opposing PK team
+        row.pk_team = getOpponentTeam(
+          row.matchup,
+          row.team
+        );
+
+        return row;
+
       });
 
-    // Identify the opposing team using the matchup
-    function getOpponentTeam(matchup, scoringTeam) {
-
-      if (!matchup || !scoringTeam) {
-        return "";
-      }
-
-      const teams = matchup.split(
-        /\s+(?:@|vs\.?|v\.?|at|-)\s+/i
-      );
-
-      if (teams.length !== 2) {
-        return "";
-      }
-
-      const firstTeam = teams[0].trim();
-      const secondTeam = teams[1].trim();
-
-      const normalize = value =>
-        value.trim().toUpperCase().replace(/\./g, "");
-
-      const scoring = normalize(scoringTeam);
-
-      if (normalize(firstTeam) === scoring) {
-        return secondTeam;
-      }
-
-      if (normalize(secondTeam) === scoring) {
-        return firstTeam;
-      }
-
-      return "";
-    }
-
     // Newest dates first
-    rows.sort((a, b) =>
+    allClips.sort((a, b) =>
       b.game_date.localeCompare(a.game_date)
     );
 
-    tbody.innerHTML = "";
-
-    rows.forEach(row => {
-
-      const tr = document.createElement("tr");
-
-      // Game date
-      const date = document.createElement("td");
-
-      date.className = "game-date";
-      date.textContent = row.game_date;
-
-      // Power play team
-      const pp = document.createElement("td");
-
-      pp.className = "pp-team";
-      pp.textContent = row.team || "";
-
-      // Penalty kill team
-      const pk = document.createElement("td");
-
-      pk.className = "pk-team";
-      pk.textContent = getOpponentTeam(
-        row.matchup,
-        row.team
-      );
-
-      // Video link
-      const clip = document.createElement("td");
-
-      if (row.clip_url) {
-
-        const link = document.createElement("a");
-
-        link.href = row.clip_url;
-        link.textContent = "WATCH CLIP";
-        link.className = "watch-button";
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-
-        clip.appendChild(link);
-
-      } else {
-
-        clip.textContent = "Unavailable";
-
-      }
-
-      tr.append(date, pp, pk, clip);
-
-      tbody.appendChild(tr);
-
-    });
-
-    count.textContent = rows.length + " CLIPS";
-
-    status.textContent =
-      "Showing all available power-play goal clips";
+    displayClips();
 
   } catch (error) {
 
@@ -519,6 +756,32 @@ async function loadClips() {
 
 }
 
+
+// --------------------------------------------------
+// SEARCH EVENTS
+// --------------------------------------------------
+
+document
+  .getElementById("teamSearch")
+  .addEventListener("input", displayClips);
+
+document
+  .getElementById("teamFilter")
+  .addEventListener("change", displayClips);
+
+document
+  .getElementById("clearSearch")
+  .addEventListener("click", function() {
+
+    document.getElementById("teamSearch").value = "";
+    document.getElementById("teamFilter").value = "both";
+
+    displayClips();
+
+  });
+
+
+// Load clips when page opens
 loadClips();
 
 </script>
