@@ -16,7 +16,26 @@ FFMPEG <- Sys.which("ffmpeg")
 FFPROBE <- Sys.which("ffprobe")
 
 video_url <- Sys.getenv("VIDEO_URL")
-filename <- Sys.getenv("OUTPUT_FILE", "nhl_goal.mp4")
+video_id <- Sys.getenv("VIDEO_ID")
+
+if (video_url == "") {
+  stop("VIDEO_URL is missing")
+}
+
+if (video_id == "") {
+  stop("VIDEO_ID is missing")
+}
+
+# Create videos folder if necessary
+dir.create("videos", showWarnings = FALSE)
+
+# Save using Brightcove video ID
+filename <- file.path(
+  "videos",
+  paste0(video_id, ".mp4")
+)
+
+message("Output file: ", filename)
 
 if (YT_DLP == "") stop("yt-dlp not found")
 if (FFMPEG == "") stop("FFmpeg not found")
