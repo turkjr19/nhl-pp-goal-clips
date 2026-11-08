@@ -10,11 +10,11 @@
 :root {
   --navy: #173e70;
   --orange: #df6436;
-  --green: #358252;
-  --background: #f5f7fa;
-  --border: #dfe6ee;
-  --muted: #718096;
-  --text: #253449;
+  --green: #267647;
+  --bg: #f5f7fa;
+  --border: #e0e7ef;
+  --muted: #6e7f94;
+  --text: #24354a;
 }
 
 * {
@@ -28,7 +28,7 @@ html {
 body {
   margin: 0;
   min-width: 0;
-  background: var(--background);
+  background: var(--bg);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont,
     "Segoe UI", Arial, sans-serif;
@@ -44,27 +44,24 @@ button {
 }
 
 button:disabled {
-  opacity: .4;
+  opacity: .42;
   cursor: not-allowed;
 }
 
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-a:focus-visible {
-  outline: 3px solid #0077c8;
+:focus-visible {
+  outline: 3px solid #1684c9;
   outline-offset: 2px;
 }
 
 .container {
   width: min(1080px, calc(100% - 32px));
-  margin-inline: auto;
+  margin: auto;
 }
 
 /* HEADER */
 
 header {
-  background: white;
+  background: #fff;
   border-bottom: 3px solid var(--orange);
 }
 
@@ -72,98 +69,93 @@ header {
   display: flex;
   align-items: center;
   gap: 12px;
-  min-height: 82px;
+  min-height: 78px;
 }
 
 .logo {
-  width: 64px;
-  height: 64px;
+  width: 62px;
+  height: 62px;
   object-fit: contain;
 }
 
 .brand {
   color: var(--navy);
   font-size: 19px;
-  font-weight: 800;
+  font-weight: 850;
   letter-spacing: 1px;
 }
 
-/* PAGE TITLE */
+/* TITLE */
 
 .hero {
-  padding: 28px 0 22px;
+  padding: 26px 0 20px;
 }
 
 .hero h1 {
   margin: 0;
   color: var(--navy);
-  font-size: clamp(25px, 5vw, 36px);
-  font-weight: 800;
-  letter-spacing: -0.7px;
-  line-height: 1.2;
+  font-size: clamp(25px, 4.5vw, 34px);
+  font-weight: 820;
+  letter-spacing: -.7px;
 }
 
-.hero p {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-/* LIBRARY */
+/* VIDEO LIBRARY */
 
 .library {
-  background: white;
+  background: #fff;
   border: 1px solid var(--border);
   border-radius: 13px;
   overflow: hidden;
   margin-bottom: 40px;
-  box-shadow: 0 4px 20px rgba(20, 50, 80, .04);
+  box-shadow: 0 4px 22px #193c6010;
 }
 
 .library-header {
-  padding: 22px 22px 15px;
+  padding: 20px 22px 15px;
 }
 
 .library-header h2 {
   margin: 0;
   color: var(--navy);
   font-size: 21px;
-  font-weight: 800;
 }
 
 /* FILTERS */
 
 .filters {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr)
-    minmax(0, 1fr) minmax(0, 1fr) auto;
+  grid-template-columns:
+    minmax(0, 1.5fr)
+    minmax(0, 1fr)
+    minmax(0, 1fr)
+    auto;
   gap: 10px;
-  padding: 0 22px 20px;
+  padding: 0 22px 19px;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  min-width: 0;
   gap: 6px;
+  min-width: 0;
 }
 
 .field label {
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .35px;
   color: var(--muted);
-  font-size: 11px;
-  font-weight: 700;
 }
 
 .field input,
 .field select {
   width: 100%;
   min-width: 0;
-  height: 43px;
-  padding: 0 11px;
+  height: 44px;
   border: 1px solid #d3dce7;
-  border-radius: 7px;
-  background: white;
+  border-radius: 8px;
+  padding: 0 11px;
+  background: #fff;
   color: var(--text);
   font-size: 13px;
 }
@@ -171,25 +163,23 @@ header {
 .field input[type="date"] {
   min-width: 0;
   max-width: 100%;
-  -webkit-appearance: none;
-  appearance: none;
   color-scheme: light;
 }
 
 .clear-button {
-  height: 43px;
   align-self: end;
+  height: 44px;
   padding: 0 15px;
   border: 1px solid var(--border);
-  border-radius: 7px;
-  background: white;
+  border-radius: 8px;
+  background: #fff;
   color: var(--navy);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 750;
 }
 
 .clear-button:hover {
-  background: #f0f5fa;
+  background: #f1f6fa;
 }
 
 /* VIEW BAR */
@@ -199,7 +189,7 @@ header {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 12px 22px;
+  padding: 11px 22px;
   background: #f8fafc;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
@@ -211,19 +201,19 @@ header {
 }
 
 .view-button {
-  padding: 9px 14px;
   border: 1px solid var(--border);
   border-radius: 7px;
-  background: white;
+  background: #fff;
   color: var(--muted);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 750;
+  padding: 9px 14px;
 }
 
 .view-button.active {
   background: var(--navy);
   border-color: var(--navy);
-  color: white;
+  color: #fff;
 }
 
 .result-count {
@@ -232,7 +222,7 @@ header {
   text-align: right;
 }
 
-/* DESKTOP TABLE */
+/* TABLE */
 
 table {
   width: 100%;
@@ -240,67 +230,103 @@ table {
 }
 
 thead {
-  background: #f8fafc;
+  background: #fafbfd;
 }
 
 th {
-  padding: 14px 18px;
   text-align: left;
   color: var(--muted);
-  font-size: 11px;
-  font-weight: 750;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .6px;
   text-transform: uppercase;
-  letter-spacing: .5px;
+  padding: 13px 19px;
 }
 
 td {
-  padding: 15px 18px;
   border-top: 1px solid var(--border);
+  padding: 12px 19px;
   font-size: 13px;
 }
 
 tbody tr:hover {
-  background: #f8fbfe;
+  background: #f9fbfe;
 }
 
 .date-main {
+  font-weight: 800;
   color: var(--navy);
   font-size: 13px;
-  font-weight: 800;
 }
 
 .date-year {
-  color: var(--muted);
   font-size: 11px;
+  color: var(--muted);
   margin-top: 3px;
 }
 
-.team {
+/* NHL TEAM LOGOS */
+
+.team-pill {
   display: inline-flex;
-  justify-content: center;
   align-items: center;
-  min-width: 48px;
-  padding: 8px 10px;
-  border-radius: 7px;
-  background: #edf2f7;
+  gap: 9px;
+  padding: 5px 10px 5px 6px;
+  border: 1px solid #e2e9f0;
+  background: #f4f7fa;
+  border-radius: 9px;
+  min-height: 42px;
   color: var(--navy);
+  font-weight: 850;
   font-size: 12px;
-  font-weight: 800;
+  white-space: nowrap;
 }
 
-.team.pp {
-  background: #eaf5ed;
+.team-pill.pp {
+  background: #f0f8f2;
+  border-color: #deebdf;
   color: var(--green);
 }
 
+.team-logo {
+  display: block;
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.team-fallback {
+  display: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #e3eaf2;
+  align-items: center;
+  justify-content: center;
+  color: var(--navy);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.team-pill.logo-failed .team-logo {
+  display: none;
+}
+
+.team-pill.logo-failed .team-fallback {
+  display: flex;
+}
+
+/* BUTTONS */
+
 .watch-button {
-  border: none;
-  border-radius: 7px;
-  padding: 10px 14px;
+  border: 0;
+  border-radius: 8px;
   background: var(--orange);
-  color: white;
+  color: #fff;
   font-size: 11px;
   font-weight: 800;
+  padding: 11px 15px;
   white-space: nowrap;
 }
 
@@ -309,25 +335,26 @@ tbody tr:hover {
 }
 
 .save-button {
-  width: 38px;
-  height: 38px;
   border: 1px solid var(--border);
-  border-radius: 7px;
-  background: white;
-  color: #8492a4;
-  font-size: 23px;
+  background: #fff;
+  color: #8a99a9;
+  border-radius: 8px;
+  width: 39px;
+  height: 39px;
+  font-size: 24px;
+  line-height: 1;
 }
 
 .save-button.saved {
   color: var(--orange);
-  background: #fff4ee;
-  border-color: #f0c5b5;
+  border-color: #f1c7b7;
+  background: #fff6f1;
 }
 
 /* EMPTY STATE */
 
 .empty {
-  padding: 45px 15px;
+  padding: 46px 16px;
   text-align: center;
 }
 
@@ -339,9 +366,9 @@ tbody tr:hover {
 }
 
 .empty p {
-  margin: 8px 0 0;
   color: var(--muted);
   font-size: 12px;
+  margin: 8px 0 0;
 }
 
 /* PAGINATION */
@@ -351,13 +378,13 @@ tbody tr:hover {
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  padding: 15px 22px;
+  padding: 14px 22px;
   border-top: 1px solid var(--border);
 }
 
 .page-info {
-  color: var(--muted);
   font-size: 12px;
+  color: var(--muted);
 }
 
 .page-buttons {
@@ -366,26 +393,26 @@ tbody tr:hover {
 }
 
 .page-button {
-  padding: 9px 12px;
   border: 1px solid var(--border);
   border-radius: 7px;
-  background: white;
+  background: #fff;
   color: var(--navy);
+  padding: 9px 12px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 750;
 }
 
 /* VIDEO PLAYER */
 
 .video-modal {
-  display: none;
   position: fixed;
   inset: 0;
   z-index: 1000;
+  display: none;
   align-items: center;
   justify-content: center;
+  background: #000d1eea;
   padding: 12px;
-  background: rgba(0, 12, 28, .9);
 }
 
 .video-modal.open {
@@ -394,69 +421,68 @@ tbody tr:hover {
 
 .video-box {
   width: min(100%, 1000px);
+  border-radius: 11px;
   overflow: hidden;
-  border-radius: 10px;
-  background: black;
+  background: #000;
 }
 
 .video-header {
+  height: 46px;
+  background: var(--navy);
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  height: 45px;
   padding: 0 10px;
-  background: var(--navy);
 }
 
 .video-close {
-  border: none;
+  border: 0;
   background: transparent;
-  color: white;
-  font-size: 29px;
-  line-height: 1;
-  padding: 5px 10px;
+  color: #fff;
+  font-size: 30px;
+  padding: 4px 10px;
 }
 
 .video-player {
   display: block;
   width: 100%;
   max-height: 75dvh;
-  background: black;
+  background: #000;
 }
 
 .video-error {
   display: none;
-  padding: 14px;
   background: #fff2ef;
-  color: #b42318;
+  color: #a51d14;
+  padding: 14px;
   font-size: 12px;
 }
 
 /* FOOTER */
 
 footer {
-  padding: 26px 12px 32px;
-  background: white;
+  background: #fff;
   border-top: 1px solid var(--border);
+  padding: 26px 12px 34px;
   text-align: center;
 }
 
 .footer-title {
-  color: var(--navy);
   font-size: 11px;
   font-weight: 800;
+  color: var(--navy);
   letter-spacing: .5px;
 }
 
 .contributors {
   margin-top: 10px;
-  color: var(--muted);
   font-size: 11px;
+  color: var(--muted);
 }
 
 .contributors a {
   color: var(--navy);
-  font-weight: 700;
+  font-weight: 750;
   text-decoration: none;
 }
 
@@ -464,7 +490,26 @@ footer {
   text-decoration: underline;
 }
 
-/* MOBILE - IPHONE / ANDROID */
+/* TABLET */
+
+@media (max-width: 760px) {
+
+  .filters {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr);
+  }
+
+  .search-field {
+    grid-column: 1 / -1;
+  }
+
+  .clear-button {
+    grid-column: 1 / -1;
+  }
+}
+
+/* IPHONE / ANDROID */
 
 @media (max-width: 650px) {
 
@@ -487,17 +532,11 @@ footer {
   }
 
   .hero {
-    padding: 22px 3px 17px;
+    padding: 20px 3px 16px;
   }
 
   .hero h1 {
-    font-size: 27px;
-    letter-spacing: -.5px;
-  }
-
-  .hero p {
-    font-size: 12px;
-    margin-top: 5px;
+    font-size: 26px;
   }
 
   .library {
@@ -506,7 +545,7 @@ footer {
   }
 
   .library-header {
-    padding: 16px 14px 13px;
+    padding: 15px 13px 12px;
   }
 
   .library-header h2 {
@@ -514,46 +553,33 @@ footer {
   }
 
   .filters {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 10px;
-    padding: 0 14px 16px;
-  }
-
-  .search-field {
-    grid-column: 1 / -1;
+    gap: 9px;
+    padding: 0 13px 14px;
   }
 
   .field input,
   .field select {
-    height: 44px;
-    font-size: 13px;
+    height: 43px;
     padding: 0 9px;
-  }
-
-  .field label {
-    font-size: 10px;
+    font-size: 13px;
   }
 
   .clear-button {
-    grid-column: 1 / -1;
-    height: 39px;
+    height: 38px;
   }
 
   .view-bar {
-    padding: 11px 14px;
-    flex-wrap: wrap;
+    padding: 10px 13px;
   }
 
   .view-button {
-    padding: 9px 12px;
     font-size: 11px;
+    padding: 9px 12px;
   }
 
   .result-count {
     font-size: 11px;
   }
-
-  /* COMPACT MOBILE ROWS */
 
   table, tbody {
     display: block;
@@ -566,11 +592,14 @@ footer {
 
   tbody tr {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr)
+      auto;
     grid-template-rows: auto auto;
     align-items: center;
     gap: 10px 8px;
-    padding: 14px;
+    padding: 12px 13px;
     border-top: 1px solid var(--border);
   }
 
@@ -578,10 +607,8 @@ footer {
     display: block;
     min-width: 0;
     padding: 0;
-    border: none;
+    border: 0;
   }
-
-  /* Date on top left */
 
   td:nth-child(1) {
     grid-column: 1 / 3;
@@ -589,15 +616,13 @@ footer {
   }
 
   .date-main {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .date-year {
     display: inline;
-    font-size: 11px;
+    font-size: 10px;
   }
-
-  /* Team labels */
 
   td:nth-child(2) {
     grid-column: 1;
@@ -615,7 +640,7 @@ footer {
     margin-bottom: 4px;
     color: var(--muted);
     font-size: 9px;
-    font-weight: 700;
+    font-weight: 800;
   }
 
   td:nth-child(2)::before {
@@ -626,13 +651,19 @@ footer {
     content: "PK TEAM";
   }
 
-  .team {
-    min-width: 43px;
-    padding: 7px 8px;
+  .team-pill {
+    min-height: 37px;
+    gap: 5px;
+    padding: 4px 7px 4px 4px;
     font-size: 11px;
+    border-radius: 7px;
   }
 
-  /* Watch on bottom right */
+  .team-logo,
+  .team-fallback {
+    width: 25px;
+    height: 25px;
+  }
 
   td:nth-child(4) {
     grid-column: 3;
@@ -640,11 +671,9 @@ footer {
   }
 
   .watch-button {
-    padding: 10px 11px;
     font-size: 10px;
+    padding: 10px;
   }
-
-  /* Save on top right */
 
   td:nth-child(5) {
     grid-column: 3;
@@ -663,7 +692,7 @@ footer {
   }
 
   .pagination {
-    padding: 13px 14px;
+    padding: 12px 13px;
   }
 
   .page-info {
@@ -684,7 +713,7 @@ footer {
   }
 }
 
-/* EXTRA SMALL PHONES */
+/* SMALL PHONES */
 
 @media (max-width: 360px) {
 
@@ -702,16 +731,31 @@ footer {
   }
 
   tbody tr {
-    padding: 12px 10px;
-    gap: 8px 5px;
+    padding: 11px 9px;
+    gap: 8px 4px;
+  }
+
+  .team-pill {
+    font-size: 10px;
+    gap: 3px;
+    padding-right: 5px;
+  }
+
+  .team-logo,
+  .team-fallback {
+    width: 23px;
+    height: 23px;
   }
 
   .watch-button {
-    padding: 9px 8px;
+    padding: 9px 7px;
   }
+}
 
-  .team {
-    min-width: 39px;
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
   }
 }
 </style>
@@ -725,9 +769,9 @@ footer {
   <div class="container header-inner">
 
     <img
-      src="ridgebacks-logo.png"
       class="logo"
-      alt="Ontario Tech Ridgebacks"
+      src="ridgebacks-logo.png"
+      alt="Ontario Tech Ridgebacks logo"
     >
 
     <div class="brand">
@@ -737,23 +781,15 @@ footer {
   </div>
 </header>
 
-<!-- PAGE -->
+<!-- MAIN CONTENT -->
 
 <main class="container">
 
   <section class="hero">
-
     <h1>NHL PP Clips</h1>
-
-    <p>
-      Browse NHL power-play goals by team and date.
-    </p>
-
   </section>
 
-  <!-- VIDEO LIBRARY -->
-
-  <section class="library">
+  <section class="library" aria-label="Video library">
 
     <div class="library-header">
       <h2>Video Library</h2>
@@ -806,9 +842,9 @@ footer {
       </div>
 
       <button
+        type="button"
         class="clear-button"
         id="clearButton"
-        type="button"
       >
         Clear Filters
       </button>
@@ -822,17 +858,19 @@ footer {
       <div class="view-buttons">
 
         <button
+          type="button"
           class="view-button active"
           id="allButton"
-          type="button"
+          aria-pressed="true"
         >
           All Clips
         </button>
 
         <button
+          type="button"
           class="view-button"
           id="savedButton"
-          type="button"
+          aria-pressed="false"
         >
           Saved
         </button>
@@ -849,7 +887,7 @@ footer {
 
     </div>
 
-    <!-- TABLE -->
+    <!-- CLIP TABLE -->
 
     <table>
 
@@ -864,6 +902,7 @@ footer {
       </thead>
 
       <tbody id="clips">
+
         <tr>
           <td colspan="5">
             <div class="empty">
@@ -871,6 +910,7 @@ footer {
             </div>
           </td>
         </tr>
+
       </tbody>
 
     </table>
@@ -939,7 +979,7 @@ footer {
 
 </footer>
 
-<!-- VIDEO MODAL -->
+<!-- VIDEO PLAYER -->
 
 <div
   class="video-modal"
@@ -988,60 +1028,92 @@ footer {
 <script>
 "use strict";
 
+/* GLOBAL VARIABLES */
+
 const $ = id => document.getElementById(id);
+
+const PAGE_SIZE = 20;
+const STORAGE_KEY = "ridgebacks-saved-clips-v1";
 
 let allClips = [];
 let filteredClips = [];
 let currentPage = 0;
 let currentView = "all";
 let lastFocus = null;
-
-const PAGE_SIZE = 20;
-const STORAGE_KEY = "ridgebacks-saved-clips-v1";
-
 let savedClips = new Set();
 
+/* LOAD SAVED CLIPS */
+
 try {
-  const stored = JSON.parse(
+
+  const data = JSON.parse(
     localStorage.getItem(STORAGE_KEY) || "[]"
   );
 
-  if (Array.isArray(stored)) {
-    savedClips = new Set(stored);
+  if (Array.isArray(data)) {
+    savedClips = new Set(
+      data.filter(x => typeof x === "string")
+    );
   }
+
 } catch (error) {
   savedClips = new Set();
 }
 
-/* LOCAL DATE HELPERS */
+/* NHL TEAM CODES */
 
-function localDateString(date) {
+const TEAM_CODES = {
+  ANA: "ANA",
+  ARI: "UTA",
+  ATL: "WPG",
+  BOS: "BOS",
+  BUF: "BUF",
+  CAR: "CAR",
+  CBJ: "CBJ",
+  CGY: "CGY",
+  CHI: "CHI",
+  COL: "COL",
+  DAL: "DAL",
+  DET: "DET",
+  EDM: "EDM",
+  FLA: "FLA",
+  LAK: "LAK",
+  LA: "LAK",
+  MIN: "MIN",
+  MTL: "MTL",
+  NJD: "NJD",
+  NJ: "NJD",
+  NSH: "NSH",
+  NYI: "NYI",
+  NYR: "NYR",
+  OTT: "OTT",
+  PHI: "PHI",
+  PIT: "PIT",
+  SEA: "SEA",
+  SJS: "SJS",
+  SJ: "SJS",
+  STL: "STL",
+  TBL: "TBL",
+  TB: "TBL",
+  TOR: "TOR",
+  UTA: "UTA",
+  UTAH: "UTA",
+  VAN: "VAN",
+  VGK: "VGK",
+  WSH: "WSH",
+  WPG: "WPG",
+  WAS: "WSH"
+};
 
-  const year = date.getFullYear();
+/* LOGO CODE */
 
-  const month = String(
-    date.getMonth() + 1
-  ).padStart(2, "0");
+function logoCode(team) {
 
-  const day = String(
-    date.getDate()
-  ).padStart(2, "0");
+  return TEAM_CODES[
+    String(team || "").trim().toUpperCase()
+  ] || "";
 
-  return `${year}-${month}-${day}`;
 }
-
-/* DEFAULT DATE = YESTERDAY */
-
-function yesterdayString() {
-
-  const date = new Date();
-
-  date.setDate(date.getDate() - 1);
-
-  return localDateString(date);
-}
-
-$("dateFilter").value = yesterdayString();
 
 /* SAFE HTML */
 
@@ -1059,11 +1131,32 @@ function escapeHTML(value) {
   );
 }
 
+/* LOCAL DATE */
+
+function localDateString(date) {
+
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0")
+  ].join("-");
+
+}
+
+/* DEFAULT TO YESTERDAY */
+
+const yesterday = new Date();
+
+yesterday.setDate(yesterday.getDate() - 1);
+
+$("dateFilter").value = localDateString(yesterday);
+
 /* CSV PARSER */
 
 function parseCSV(text) {
 
   const rows = [];
+
   let row = [];
   let cell = "";
   let quoted = false;
@@ -1123,37 +1216,37 @@ function parseCSV(text) {
   return rows;
 }
 
-/* GET OPPONENT */
+/* OPPONENT TEAM */
 
-function getOpponentTeam(matchup, scoringTeam) {
+function getOpponentTeam(matchup, team) {
 
-  if (!matchup || !scoringTeam) {
+  if (!matchup || !team) {
     return "";
   }
 
-  const teams = matchup.split(
+  const parts = matchup.split(
     /\s+(?:@|vs\.?|v\.?|at|-)\s+/i
   );
 
-  if (teams.length !== 2) {
+  if (parts.length !== 2) {
     return "";
   }
 
   const normalize = value =>
     value.trim().toUpperCase().replace(/\./g, "");
 
-  if (normalize(teams[0]) === normalize(scoringTeam)) {
-    return teams[1].trim();
+  if (normalize(parts[0]) === normalize(team)) {
+    return parts[1].trim();
   }
 
-  if (normalize(teams[1]) === normalize(scoringTeam)) {
-    return teams[0].trim();
+  if (normalize(parts[1]) === normalize(team)) {
+    return parts[0].trim();
   }
 
   return "";
 }
 
-/* GET VIDEO ID */
+/* VIDEO ID */
 
 function getVideoId(row) {
 
@@ -1209,11 +1302,9 @@ function getClipUrl(row) {
 
   const id = getVideoId(row);
 
-  if (!id) return "";
-
-  return "videos/" +
-    encodeURIComponent(id) +
-    ".mp4";
+  return id
+    ? "videos/" + encodeURIComponent(id) + ".mp4"
+    : "";
 }
 
 /* CLIP KEY */
@@ -1226,6 +1317,7 @@ function clipKey(row) {
     row.pk_team,
     row.videoUrl
   ].join("|");
+
 }
 
 /* FORMAT DATE */
@@ -1261,11 +1353,46 @@ function formatDate(value) {
   };
 }
 
-/* FILTER CLIPS */
+/* NHL TEAM LOGO HTML */
 
-function applyFilters(resetPage = true) {
+function teamHTML(team, isPP) {
 
-  if (resetPage) {
+  const name = escapeHTML(team || "—");
+  const code = logoCode(team);
+
+  return `
+    <span class="team-pill
+      ${isPP ? "pp" : ""}
+      ${code ? "" : "logo-failed"}">
+
+      ${code ? `
+        <img
+          class="team-logo"
+          src="https://assets.nhle.com/logos/nhl/svg/${code}_light.svg"
+          alt=""
+          loading="lazy"
+          referrerpolicy="no-referrer"
+        >
+      ` : ""}
+
+      <span
+        class="team-fallback"
+        aria-hidden="true"
+      >
+        ${escapeHTML((team || "?").slice(0, 2))}
+      </span>
+
+      <span>${name}</span>
+
+    </span>
+  `;
+}
+
+/* APPLY FILTERS */
+
+function applyFilters(reset = true) {
+
+  if (reset) {
     currentPage = 0;
   }
 
@@ -1273,13 +1400,10 @@ function applyFilters(resetPage = true) {
     .value.trim()
     .toUpperCase();
 
-  const selectedDate = $("dateFilter").value;
-
-  const teamType = $("teamFilter").value;
+  const date = $("dateFilter").value;
+  const type = $("teamFilter").value;
 
   filteredClips = allClips.filter(row => {
-
-    /* SAVED FILTER */
 
     if (
       currentView === "saved" &&
@@ -1288,29 +1412,25 @@ function applyFilters(resetPage = true) {
       return false;
     }
 
-    /* DATE FILTER */
-
     if (
-      selectedDate &&
-      row.game_date.slice(0, 10) !== selectedDate
+      date &&
+      String(row.game_date || "").slice(0, 10) !== date
     ) {
       return false;
     }
-
-    /* TEAM FILTER */
 
     if (!query) {
       return true;
     }
 
-    const pp = (row.team || "").toUpperCase();
-    const pk = (row.pk_team || "").toUpperCase();
+    const pp = String(row.team || "").toUpperCase();
+    const pk = String(row.pk_team || "").toUpperCase();
 
-    if (teamType === "pp") {
+    if (type === "pp") {
       return pp.includes(query);
     }
 
-    if (teamType === "pk") {
+    if (type === "pk") {
       return pk.includes(query);
     }
 
@@ -1321,11 +1441,9 @@ function applyFilters(resetPage = true) {
 
   });
 
-  /* ALWAYS NEWEST FIRST */
-
   filteredClips.sort((a, b) =>
-    (b.game_date || "").localeCompare(
-      a.game_date || ""
+    String(b.game_date || "").localeCompare(
+      String(a.game_date || "")
     )
   );
 
@@ -1349,9 +1467,7 @@ function renderClips() {
       ? " clip found"
       : " clips found");
 
-  /* NO CLIPS */
-
-  if (rows.length === 0) {
+  if (!rows.length) {
 
     $("clips").innerHTML = `
       <tr>
@@ -1368,23 +1484,11 @@ function renderClips() {
 
   } else {
 
-    $("clips").innerHTML = rows.map((row, index) => {
+    $("clips").innerHTML = rows.map((row, i) => {
 
       const date = formatDate(row.game_date);
-      const isSaved = savedClips.has(clipKey(row));
-      const rowIndex = start + index;
-
-      const videoButton = row.videoUrl
-        ? `
-          <button
-            class="watch-button"
-            type="button"
-            data-play="${rowIndex}"
-          >
-            ▶ WATCH
-          </button>
-        `
-        : `<span>Unavailable</span>`;
+      const index = start + i;
+      const saved = savedClips.has(clipKey(row));
 
       return `
         <tr>
@@ -1393,38 +1497,44 @@ function renderClips() {
             <div class="date-main">
               ${escapeHTML(date.main)}
             </div>
+
             <div class="date-year">
               ${escapeHTML(date.year)}
             </div>
           </td>
 
           <td>
-            <span class="team pp">
-              ${escapeHTML(row.team || "—")}
-            </span>
+            ${teamHTML(row.team, true)}
           </td>
 
           <td>
-            <span class="team">
-              ${escapeHTML(row.pk_team || "—")}
-            </span>
+            ${teamHTML(row.pk_team, false)}
           </td>
 
           <td>
-            ${videoButton}
+            ${row.videoUrl ? `
+              <button
+                type="button"
+                class="watch-button"
+                data-play="${index}"
+                aria-label="Watch clip"
+              >
+                ▶ WATCH
+              </button>
+            ` : "Unavailable"}
           </td>
 
           <td>
             <button
-              class="save-button ${isSaved ? "saved" : ""}"
               type="button"
-              data-save="${rowIndex}"
-              aria-label="${isSaved
+              class="save-button ${saved ? "saved" : ""}"
+              data-save="${index}"
+              aria-label="${saved
                 ? "Remove saved clip"
                 : "Save clip"}"
-              aria-pressed="${isSaved}"
+              aria-pressed="${saved}"
             >
-              ${isSaved ? "★" : "☆"}
+              ${saved ? "★" : "☆"}
             </button>
           </td>
 
@@ -1451,6 +1561,19 @@ function renderClips() {
     start + PAGE_SIZE >= filteredClips.length;
 }
 
+/* LOGO FALLBACK */
+
+$("clips").addEventListener("error", event => {
+
+  if (event.target.matches("img.team-logo")) {
+
+    event.target.closest(".team-pill")
+      ?.classList.add("logo-failed");
+
+  }
+
+}, true);
+
 /* OPEN VIDEO */
 
 function openVideo(url) {
@@ -1459,8 +1582,8 @@ function openVideo(url) {
 
   lastFocus = document.activeElement;
 
-  const modal = $("videoModal");
   const player = $("clipPlayer");
+  const modal = $("videoModal");
   const error = $("videoError");
 
   error.style.display = "none";
@@ -1470,7 +1593,7 @@ function openVideo(url) {
   player.removeAttribute("src");
   player.load();
 
-  player.onerror = function() {
+  player.onerror = () => {
 
     error.textContent =
       "This clip could not be loaded. " +
@@ -1489,7 +1612,6 @@ function openVideo(url) {
   $("closeVideo").focus();
 
   player.load();
-
   player.play().catch(() => {});
 }
 
@@ -1514,7 +1636,7 @@ function closeVideo() {
 
   document.body.style.overflow = "";
 
-  if (lastFocus && lastFocus.isConnected) {
+  if (lastFocus?.isConnected) {
     lastFocus.focus();
   }
 }
@@ -1545,7 +1667,7 @@ function toggleSaved(row) {
   applyFilters(false);
 }
 
-/* TABLE BUTTONS */
+/* TABLE EVENTS */
 
 $("clips").addEventListener("click", event => {
 
@@ -1575,25 +1697,25 @@ $("clips").addEventListener("click", event => {
     if (row) {
       toggleSaved(row);
     }
+
   }
+
 });
 
-/* SEARCH EVENTS */
+/* FILTER EVENTS */
 
-$("search").addEventListener(
-  "input",
-  () => applyFilters()
-);
+for (const id of [
+  "search",
+  "dateFilter",
+  "teamFilter"
+]) {
 
-$("dateFilter").addEventListener(
-  "change",
-  () => applyFilters()
-);
+  $(id).addEventListener(
+    id === "search" ? "input" : "change",
+    () => applyFilters()
+  );
 
-$("teamFilter").addEventListener(
-  "change",
-  () => applyFilters()
-);
+}
 
 /* CLEAR FILTERS */
 
@@ -1606,29 +1728,44 @@ $("clearButton").addEventListener("click", () => {
   applyFilters();
 });
 
-/* ALL CLIPS */
+/* ALL / SAVED VIEW */
 
-$("allButton").addEventListener("click", () => {
+function setView(view) {
 
-  currentView = "all";
+  currentView = view;
 
-  $("allButton").classList.add("active");
-  $("savedButton").classList.remove("active");
+  $("allButton").classList.toggle(
+    "active",
+    view === "all"
+  );
+
+  $("savedButton").classList.toggle(
+    "active",
+    view === "saved"
+  );
+
+  $("allButton").setAttribute(
+    "aria-pressed",
+    String(view === "all")
+  );
+
+  $("savedButton").setAttribute(
+    "aria-pressed",
+    String(view === "saved")
+  );
 
   applyFilters();
-});
+}
 
-/* SAVED CLIPS */
+$("allButton").addEventListener(
+  "click",
+  () => setView("all")
+);
 
-$("savedButton").addEventListener("click", () => {
-
-  currentView = "saved";
-
-  $("savedButton").classList.add("active");
-  $("allButton").classList.remove("active");
-
-  applyFilters();
-});
+$("savedButton").addEventListener(
+  "click",
+  () => setView("saved")
+);
 
 /* PAGINATION */
 
@@ -1638,6 +1775,7 @@ $("previousPage").addEventListener("click", () => {
     currentPage--;
     renderClips();
   }
+
 });
 
 $("nextPage").addEventListener("click", () => {
@@ -1646,9 +1784,12 @@ $("nextPage").addEventListener("click", () => {
     (currentPage + 1) * PAGE_SIZE <
     filteredClips.length
   ) {
+
     currentPage++;
     renderClips();
+
   }
+
 });
 
 /* VIDEO EVENTS */
@@ -1663,6 +1804,7 @@ $("videoModal").addEventListener("click", event => {
   if (event.target === $("videoModal")) {
     closeVideo();
   }
+
 });
 
 document.addEventListener("keydown", event => {
@@ -1694,8 +1836,11 @@ document.addEventListener("keydown", event => {
 
       event.preventDefault();
       focusable[0].focus();
+
     }
+
   }
+
 });
 
 /* LOAD CSV */
@@ -1709,16 +1854,15 @@ async function loadClips() {
     );
 
     if (!response.ok) {
-      throw new Error("Could not load CSV");
+      throw new Error("CSV unavailable");
     }
 
-    const text = (
-      await response.text()
-    ).replace(/^\uFEFF/, "");
-
-    const records = parseCSV(text);
+    const records = parseCSV(
+      (await response.text()).replace(/^\uFEFF/, "")
+    );
 
     if (records.length < 2) {
+
       allClips = [];
       applyFilters();
       return;
@@ -1731,16 +1875,15 @@ async function loadClips() {
     allClips = records.map(values => {
 
       const row = Object.fromEntries(
-        headers.map((header, index) => [
+        headers.map((header, i) => [
           header,
-          (values[index] || "").trim()
+          (values[i] || "").trim()
         ])
       );
 
-      row.pk_team = getOpponentTeam(
-        row.matchup,
-        row.team
-      );
+      row.pk_team =
+        row.pk_team ||
+        getOpponentTeam(row.matchup, row.team);
 
       row.videoUrl = getClipUrl(row);
 
@@ -1761,7 +1904,7 @@ async function loadClips() {
             <strong>COULD NOT LOAD CLIPS</strong>
             <p>
               Check that pp_goal_clips.csv
-              is in the website folder.
+              is beside index.html.
             </p>
           </div>
         </td>
@@ -1769,8 +1912,10 @@ async function loadClips() {
     `;
 
     $("pageInfo").textContent = "Unavailable";
+
     $("previousPage").disabled = true;
     $("nextPage").disabled = true;
+
   }
 }
 
@@ -1779,5 +1924,6 @@ async function loadClips() {
 loadClips();
 
 </script>
+
 </body>
 </html>
