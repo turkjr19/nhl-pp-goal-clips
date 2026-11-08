@@ -45,7 +45,7 @@ GH_API    <- Sys.getenv("GH_API", unset = "https://api.github.com")
 
 as_text <- function(x) {
   if (is.null(x) || length(x) == 0) return(NA_character_)
-
+  
   if (is.list(x)) {
     if (!is.null(x$default)) {
       x <- x$default
@@ -53,11 +53,11 @@ as_text <- function(x) {
       return(NA_character_)
     }
   }
-
+  
   if (is.numeric(x)) {
     return(format(x[1], scientific = FALSE, trim = TRUE))
   }
-
+  
   as.character(x[1])
 }
 
@@ -74,32 +74,32 @@ nhl_get <- function(path) {
 # ------------------------------------------------------------
 
 get_started_game_ids <- function(date) {
-
+  
   sched <- nhl_get(paste0("/schedule/", date))
-
+  
   day <- Filter(
     function(d) identical(d$date, date),
     sched$gameWeek
   )
-
+  
   if (length(day) == 0) return(character())
-
+  
   games <- day[[1]]$games
-
+  
   if (length(games) == 0) return(character())
-
+  
   ids <- vapply(
     games,
     function(g) as_text(g$id),
     character(1)
   )
-
+  
   states <- vapply(
     games,
     function(g) as_text(g$gameState),
     character(1)
   )
-
+  
   ids[!states %in% c("FUT", "PRE")]
 }
 
@@ -108,9 +108,9 @@ get_started_game_ids <- function(date) {
 # ------------------------------------------------------------
 
 goal_row <- function(g, game_id, matchup, period_label, game_date) {
-
+  
   scorer <- as_text(g$name)
-
+  
   if (is.na(scorer)) {
     scorer <- trimws(
       paste(
@@ -122,17 +122,17 @@ goal_row <- function(g, game_id, matchup, period_label, game_date) {
       )
     )
   }
-
+  
   clip <- as_text(g$highlightClip)
-
+  
   sharing <- as_text(g$highlightClipSharingUrl)
-
+  
   player <- if (is.na(clip)) {
     NA_character_
   } else {
     paste0(BRIGHTCOVE_PLAYER, clip)
   }
-
+  
   data.frame(
     game_date      = game_date,
     game_id        = game_id,
@@ -157,36 +157,36 @@ goal_row <- function(g, game_id, matchup, period_label, game_date) {
 # ------------------------------------------------------------
 
 get_goals_for_game <- function(game_id, game_date) {
-
+  
   land <- nhl_get(
     paste0("/gamecenter/", game_id, "/landing")
   )
-
+  
   scoring <- land$summary$scoring
-
+  
   if (is.null(scoring) || length(scoring) == 0) {
     return(NULL)
   }
-
+  
   matchup <- paste0(
     as_text(land$awayTeam$abbrev),
     " @ ",
     as_text(land$homeTeam$abbrev)
   )
-
+  
   rows <- list()
-
+  
   for (p in scoring) {
-
+    
     pd <- p$periodDescriptor
-
+    
     period_label <- paste0(
       as_text(pd$periodType),
       as_text(pd$number)
     )
-
+    
     for (g in p$goals) {
-
+      
       rows[[length(rows) + 1]] <- goal_row(
         g,
         game_id,
@@ -196,9 +196,9 @@ get_goals_for_game <- function(game_id, game_date) {
       )
     }
   }
-
+  
   if (length(rows) == 0) return(NULL)
-
+  
   do.call(rbind, rows)
 }
 
@@ -207,11 +207,11 @@ get_goals_for_game <- function(game_id, game_date) {
 # ------------------------------------------------------------
 
 get_goals <- function(date) {
-
+  
   ids <- get_started_game_ids(date)
-
+  
   out <- lapply(ids, function(id) {
-
+    
     tryCatch(
       get_goals_for_game(id, date),
       error = function(e) {
@@ -226,11 +226,11 @@ get_goals <- function(date) {
       }
     )
   })
-
+  
   out <- Filter(Negate(is.null), out)
-
+  
   if (length(out) == 0) return(NULL)
-
+  
   do.call(rbind, out)
 }
 
@@ -276,43 +276,43 @@ goal_key <- function(df) {
 # ------------------------------------------------------------
 
 upgrade_existing_csv <- function() {
-
+  
   if (!file.exists(OUT_FILE)) return(invisible())
-
+  
   old <- read.csv(
     OUT_FILE,
     colClasses = "character",
     stringsAsFactors = FALSE
   )
-
+  
   changed <- FALSE
-
+  
   for (col in CSV_COLS) {
-
+    
     if (!col %in% names(old)) {
-
+      
       old[[col]] <- NA_character_
       changed <- TRUE
-
+      
       message("Added missing CSV column: ", col)
     }
   }
-
+  
   if (!identical(names(old), CSV_COLS)) {
-
+    
     old <- old[, CSV_COLS, drop = FALSE]
     changed <- TRUE
   }
-
+  
   if (changed) {
-
+    
     write.csv(
       old,
       OUT_FILE,
       row.names = FALSE,
       na = ""
     )
-
+    
     message("Existing CSV successfully upgraded.")
   }
 }
@@ -325,49 +325,49 @@ upgrade_existing_csv()
 # ------------------------------------------------------------
 
 save_csv <- function(out) {
-
+  
   if (nrow(out) == 0) return(invisible())
-
+  
   if (file.exists(OUT_FILE)) {
-
+    
     old <- read.csv(
       OUT_FILE,
       colClasses = "character",
       stringsAsFactors = FALSE
     )
-
+    
     for (col in CSV_COLS) {
-
+      
       if (!col %in% names(old)) {
         old[[col]] <- NA_character_
       }
     }
-
+    
     old <- old[, CSV_COLS, drop = FALSE]
-
+    
     # Remove goals already in the CSV.
     out <- out[
       !goal_key(out) %in% goal_key(old),
       ,
       drop = FALSE
     ]
-
+    
     if (nrow(out) == 0) return(invisible())
-
+    
     combined <- rbind(old, out)
-
+    
   } else {
-
+    
     combined <- out[, CSV_COLS, drop = FALSE]
   }
-
+  
   write.csv(
     combined,
     OUT_FILE,
     row.names = FALSE,
     na = ""
   )
-
+  
   message(
     "CSV updated: ",
     nrow(combined),
@@ -380,7 +380,7 @@ save_csv <- function(out) {
 # ------------------------------------------------------------
 
 gh_req <- function(url, accept = "application/vnd.github+json") {
-
+  
   request(url) |>
     req_auth_bearer_token(GH_TOKEN) |>
     req_headers(
@@ -392,7 +392,7 @@ gh_req <- function(url, accept = "application/vnd.github+json") {
 }
 
 gh_message <- function(resp) {
-
+  
   tryCatch(
     as.character(resp_body_json(resp)$message),
     error = function(e) ""
@@ -400,11 +400,11 @@ gh_message <- function(resp) {
 }
 
 csv_bytes <- function(df) {
-
+  
   tmp <- tempfile(fileext = ".csv")
-
+  
   on.exit(unlink(tmp))
-
+  
   write.csv(
     df,
     tmp,
@@ -412,7 +412,7 @@ csv_bytes <- function(df) {
     na = "",
     fileEncoding = "UTF-8"
   )
-
+  
   readBin(tmp, "raw", file.size(tmp))
 }
 
@@ -421,7 +421,7 @@ csv_bytes <- function(df) {
 # ------------------------------------------------------------
 
 github_sync_once <- function(out) {
-
+  
   url <- paste0(
     GH_API,
     "/repos/",
@@ -429,7 +429,7 @@ github_sync_once <- function(out) {
     "/contents/",
     GH_PATH
   )
-
+  
   with_ref <- function(req) {
     if (nzchar(GH_BRANCH)) {
       req_url_query(req, ref = GH_BRANCH)
@@ -437,22 +437,22 @@ github_sync_once <- function(out) {
       req
     }
   }
-
+  
   meta <- with_ref(gh_req(url)) |>
     req_perform()
-
+  
   sha <- NULL
   combined <- out
-
+  
   if (resp_status(meta) == 200) {
-
+    
     sha <- resp_body_json(meta)$sha
-
+    
     raw <- with_ref(
       gh_req(url, "application/vnd.github.raw+json")
     ) |>
       req_perform()
-
+    
     if (resp_status(raw) != 200) {
       stop(
         "Could not read ",
@@ -462,44 +462,44 @@ github_sync_once <- function(out) {
         ")"
       )
     }
-
+    
     csv_text <- resp_body_string(
       raw,
       encoding = "UTF-8"
     )
-
+    
     if (nzchar(trimws(csv_text))) {
-
+      
       old <- read.csv(
         text = csv_text,
         colClasses = "character",
         encoding = "UTF-8",
         stringsAsFactors = FALSE
       )
-
+      
       # Upgrade older GitHub CSV files too.
       for (col in CSV_COLS) {
-
+        
         if (!col %in% names(old)) {
           old[[col]] <- NA_character_
         }
       }
-
+      
       old <- old[, CSV_COLS, drop = FALSE]
-
+      
       out <- out[
         !goal_key(out) %in% goal_key(old),
         ,
         drop = FALSE
       ]
-
+      
       if (nrow(out) == 0) return(0L)
-
+      
       combined <- rbind(old, out)
     }
-
+    
   } else if (resp_status(meta) != 404) {
-
+    
     stop(
       "HTTP ",
       resp_status(meta),
@@ -507,7 +507,7 @@ github_sync_once <- function(out) {
       gh_message(meta)
     )
   }
-
+  
   body <- list(
     message = sprintf(
       "Add %d power play goal(s): %s",
@@ -518,36 +518,36 @@ github_sync_once <- function(out) {
       csv_bytes(combined)
     )
   )
-
+  
   if (!is.null(sha)) {
     body$sha <- sha
   }
-
+  
   if (nzchar(GH_BRANCH)) {
     body$branch <- GH_BRANCH
   }
-
+  
   put <- gh_req(url) |>
     req_method("PUT") |>
     req_body_json(body) |>
     req_perform()
-
+  
   status <- resp_status(put)
-
+  
   if (status %in% c(200, 201)) {
     return(nrow(out))
   }
-
+  
   if (status %in% c(409, 422)) {
     return(NA_integer_)
   }
-
+  
   hint <- if (status == 404) {
     " - check GH_REPO and token permissions"
   } else {
     ""
   }
-
+  
   stop(
     "HTTP ",
     status,
@@ -558,27 +558,27 @@ github_sync_once <- function(out) {
 }
 
 save_github <- function(out) {
-
+  
   if (GH_REPO == "" || nrow(out) == 0) {
     return(invisible())
   }
-
+  
   tryCatch({
-
+    
     if (GH_TOKEN == "") {
       stop("GH_TOKEN is not set")
     }
-
+    
     n <- github_sync_once(out)
-
+    
     if (is.na(n)) {
       n <- github_sync_once(out)
     }
-
+    
     if (is.na(n)) {
       stop("The file kept changing; will retry next pass")
     }
-
+    
     if (n > 0) {
       message(
         sprintf(
@@ -589,9 +589,9 @@ save_github <- function(out) {
         )
       )
     }
-
+    
   }, error = function(e) {
-
+    
     message(
       "GitHub update failed: ",
       conditionMessage(e)
@@ -604,13 +604,13 @@ save_github <- function(out) {
 # ------------------------------------------------------------
 
 save_new <- function(clips) {
-
+  
   if (nrow(clips) == 0) return(invisible())
-
+  
   out <- clips[, CSV_COLS, drop = FALSE]
-
+  
   save_csv(out)
-
+  
   save_github(out)
 }
 
@@ -619,11 +619,11 @@ save_new <- function(clips) {
 # ------------------------------------------------------------
 
 show_clips <- function(clips) {
-
+  
   for (i in seq_len(nrow(clips))) {
-
+    
     with(clips[i, ], {
-
+      
       cat(
         sprintf(
           "[%s] %s %s %s | %s | %s %s-%s | %s\n",
@@ -674,47 +674,47 @@ date <- if (length(date_arg)) {
 seen_keys <- character()
 
 repeat {
-
+  
   goals <- tryCatch(
     get_goals(date),
     error = function(e) {
-
+      
       message(
         "Request failed: ",
         conditionMessage(e)
       )
-
+      
       NULL
     }
   )
-
+  
   if (is.null(goals)) {
-
+    
     message(
       sprintf(
         "%s: no goals found yet.",
         date
       )
     )
-
+    
   } else {
-
+    
     total <- nrow(goals)
-
+    
     is_pp <- !is.na(goals$strength) &
       goals$strength == "pp"
-
+    
     if (pp_only) {
       goals <- goals[is_pp, , drop = FALSE]
     }
-
+    
     # Only save goals that have a highlight clip.
     clips <- goals[
       !is.na(goals$highlight_clip),
       ,
       drop = FALSE
     ]
-
+    
     message(
       sprintf(
         "%s: %d goals total%s; %d clips ready, %d waiting for a clip.",
@@ -729,30 +729,30 @@ repeat {
         nrow(goals) - nrow(clips)
       )
     )
-
+    
     if (nrow(clips) > 0) {
-
+      
       keys <- paste(
         clips$game_id,
         clips$highlight_clip
       )
-
+      
       to_show <- if (watch) {
         clips[!keys %in% seen_keys, , drop = FALSE]
       } else {
         clips
       }
-
+      
       show_clips(to_show)
-
+      
       save_new(clips)
-
+      
       seen_keys <- union(seen_keys, keys)
     }
   }
-
+  
   if (!watch) break
-
+  
   Sys.sleep(POLL_SECONDS)
 }
 
