@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NHL Power Play Goal Clips</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f5f8;
+      color: #202a36;
+      margin: 0;
+      padding: 30px 15px;
+    }
+
+    .container {
+      max-width: 950px;
+      margin: auto;
+    }
+
+    h1 {
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      color: #657184;
+      margin-bottom: 25px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #e5e9ef;
+    }
+
+    th {
+      background: #172b4d;
+      color: white;
+    }
+
+    tr:hover {
+      background: #f5f8fc;
+    }
+
+    a {
+      color: #1769aa;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    #status {
+      margin: 15px 0;
+      color: #657184;
+    }
+
+    @media (max-width: 600px) {
+      th, td {
+        padding: 10px 7px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>NHL Power Play Goal Clips</h1>
+    <div class="subtitle">Daily collection of NHL power-play goals</div>
+
+    <div id="status">Loading clips...</div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Game Date</th>
+          <th>Matchup</th>
+          <th>Clip</th>
+        </tr>
+      </thead>
+      <tbody id="clips"></tbody>
+    </table>
+  </div>
+
+  <script>
+    async function loadClips() {
+      const status = document.getElementById("status");
+      const tbody = document.getElementById("clips");
+
+      try {
+        const response = await fetch("pp_goal_clips.csv?t=" + Date.now());
+
+        if (!response.ok) {
+          throw new Error("Could not load CSV");
+        }
+
+        const csv = await response.text();
+        const lines = csv.trim().split(/\r?\n/);
+
+        if (lines.length <= 1) {
+          status.textContent = "No clips available yet.";
+          return;
+        }
+
+        function parseCSVLine(line) {
+          const result = [];
+          let value = "";
+          let quoted = false;
+
+          for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+
+            if (char === '"') {
+              if (quoted && line[i + 1] === '"') {
+                value += '"';
+                i++;
+              } else {
+                quoted = !quoted;
+              }
+            } else if (char === "," && !quoted) {
+              result.push(value);
+              value = "";
+            } else {
+              value += char;
+            }
+          }
+
+          result.push(value);
+          return result;
+        }
+
+        const headers = parseCSVLine(lines[0]);
+        const rows = lines.slice(1).filter(line => line.trim() !== "")
+          .map(line => {
+            const values = parseCSVLine(line);
+            return Object.fromEntries(
+              headers.map((header, i) => [header, values[i] || ""])
+            );
+          });
+
+        rows.sort((a, b) =>
+          b.game_date.localeCompare(a.game_date)
+        );
+
+        tbody.innerHTML = "";
+
+        rows.forEach(row => {
+          const tr = document.createElement("tr");
+
+          const date = document.createElement("td");
+          date.textContent = row.game_date;
+
+          const matchup = document.createElement("td");
+          matchup.textContent = row.matchup;
+
+          const clip = document.createElement("td");
+          const link = document.createElement("a");
+          link.href = row.clip_url;
+          link.textContent = "Watch Clip";
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+
+          clip.appendChild(link);
+          tr.append(date, matchup, clip);
+          tbody.appendChild(tr);
+        });
+
+        status.textContent = rows.length + " power-play goal clips";
+
+      } catch (error) {
+        status.textContent = "Error loading clips: " + error.message;
+      }
+    }
+
+    loadClips();
+  </script>
+</body>
+</html>
