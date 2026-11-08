@@ -1,281 +1,293 @@
 
 # ============================================================
-# NHL GOAL BOT - GITHUB VIDEO PROCESSING
+# Hockey Video Processing
+# Reads player_url from pp_goal_clips.csv
+# Downloads each unique Brightcove video
+# Trims to the final 100 seconds
+# Saves as videos/VIDEO_ID.mp4
 # ============================================================
 
-MAXIMUM_DURATION <- 100
-MAXIMUM_SIZE <- 100000000
-
-DOWNLOAD_RETRY_DELAY_SECONDS <- 10
-
-DELETE_RETRY_ATTEMPTS <- 5
-DELETE_RETRY_DELAY_SECONDS <- 0.5
-
-YT_DLP <- Sys.which("yt-dlp")
-FFMPEG <- Sys.which("ffmpeg")
-FFPROBE <- Sys.which("ffprobe")
-
-video_url <- Sys.getenv("VIDEO_URL")
-video_id <- Sys.getenv("VIDEO_ID")
-
-if (video_url == "") {
-  stop("VIDEO_URL is missing")
-}
-
-if (video_id == "") {
-  stop("VIDEO_ID is missing")
-}
-
-# Create videos folder if necessary
-dir.create("videos", showWarnings = FALSE)
-
-# Save using Brightcove video ID
-filename <- file.path(
-  "videos",
-  paste0(video_id, ".mp4")
-)
-
-message("Output file: ", filename)
-
-if (YT_DLP == "") stop("yt-dlp not found")
-if (FFMPEG == "") stop("FFmpeg not found")
-if (FFPROBE == "") stop("FFprobe not found")
-if (video_url == "") stop("VIDEO_URL is missing")
-
-
 # ------------------------------------------------------------
-# DOWNLOAD
+# SETTINGS
 # ------------------------------------------------------------
 
-download_file <- function(url, filename) {
+CSV_FILE <- "pp_goal_clips.csv"
+OUTPUT_FOLDER <- "videos"
 
-  args <- c(
-    "--quiet",
-    "--no-warnings",
-    "--no-playlist",
-    "--retries", "3",
-    "--fragment-retries", "3",
-    "--force-overwrites",
-    "--merge-output-format", "mp4",
-    "--remux-video", "mp4",
-    "-o", filename,
-    url
+MAX_DURATION <- 100
+MAXIMUM_SIZE <- 100 * 1000 * 1000
+
+YT_DLP <- "yt-dlp"
+FFMPEG <- "ffmpeg"
+FFPROBE <- "ffprobe"
+
+dir.create(OUTPUT_FOLDER, showWarnings = FALSE)
+
+# ------------------------------------------------------------
+# EXTRACT BRIGHTCOVE VIDEO ID
+# ------------------------------------------------------------
+
+get_video_id <- function(url) {
+
+  match <- regmatches(
+    url,
+    regexpr("[?&]videoId=[^&]+", url)
   )
 
-  result <- tryCatch({
-
-    output <- system2(
-      YT_DLP,
-      args = shQuote(args),
-      stdout = TRUE,
-      stderr = TRUE
-    )
-
-    status <- attr(output, "status")
-    if (is.null(status)) status <- 0
-
-    status == 0 &&
-      file.exists(filename) &&
-      file.info(filename)$size > 0
-
-  }, error = function(e) FALSE)
-
-  result
-}
-
-
-download <- function(url, filename) {
-
-  for (attempt in 1:5) {
-
-    message("Download attempt ", attempt, " of 5")
-
-    if (download_file(url, filename)) {
-      message("Download successful")
-      return(TRUE)
-    }
-
-    if (attempt < 5) {
-      Sys.sleep(DOWNLOAD_RETRY_DELAY_SECONDS)
-    }
+  if (length(match) == 0 || !nzchar(match)) {
+    return(NA_character_)
   }
 
-  stop("Download failed after five attempts")
+  sub("^[?&]videoId=", "", match)
 }
 
-
 # ------------------------------------------------------------
-# VIDEO DURATION
+# GET VIDEO DURATION
 # ------------------------------------------------------------
 
 get_duration <- function(file) {
 
   result <- system2(
     FFPROBE,
-    args = shQuote(c(
+    args = c(
       "-v", "error",
       "-show_entries", "format=duration",
-      "-of", "csv=p=0",
+      "-of", "default=noprint_wrappers=1:nokey=1",
       file
-    )),
+    ),
     stdout = TRUE,
-    stderr = FALSE
+    stderr = TRUE
   )
 
   as.numeric(result[1])
 }
 
-
 # ------------------------------------------------------------
-# VIDEO SIZE
-# ------------------------------------------------------------
-
-get_size <- function(file) {
-
-  as.numeric(file.info(file)$size)
-}
-
-
-# ------------------------------------------------------------
-# TRIM VIDEO
+# PROCESS ONE VIDEO
 # ------------------------------------------------------------
 
-trim <- function(file, start, end) {
+process_video <- function(url, video_id) {
 
-  output_file <- sub(
-    "\\.mp4$",
-    "_trimmed.mp4",
-    file,
-    ignore.case = TRUE
+  output_file <- file.path(
+    OUTPUT_FOLDER,
+    paste0(video_id, ".mp4")
   )
 
-  args <- c(
-    "-y",
-    "-ss", as.character(start),
-    "-i", file,
-    "-t", as.character(end - start),
-    "-map", "0",
-    "-c", "copy",
-    "-avoid_negative_ts", "make_zero",
-    output_file
-  )
-
-  status <- system2(
-    FFMPEG,
-    args = shQuote(args),
-    stdout = FALSE,
-    stderr = FALSE
-  )
-
-  if (status != 0 || !file.exists(output_file)) {
-    stop("Video trimming failed")
+  # Skip existing videos
+  if (file.exists(output_file)) {
+    message("Already downloaded: ", video_id)
+    return(invisible(NULL))
   }
 
-  output_file
+  message("----------------------------------------")
+  message("Processing video: ", video_id)
+  message("URL: ", url)
+
+  temp_folder <- tempfile("hockey_video_")
+  dir.create(temp_folder)
+
+  on.exit(
+    unlink(temp_folder, recursive = TRUE),
+    add = TRUE
+  )
+
+  download_template <- file.path(
+    temp_folder,
+    "source.%(ext)s"
+  )
+
+  # ----------------------------------------------------------
+  # DOWNLOAD
+  # ----------------------------------------------------------
+
+  message("Downloading video...")
+
+  download_result <- system2(
+    YT_DLP,
+    args = c(
+      "--quiet",
+      "--no-warnings",
+      "--no-playlist",
+      "--retries", "5",
+      "--fragment-retries", "5",
+      "--force-overwrites",
+      "--merge-output-format", "mp4",
+      "--remux-video", "mp4",
+      "-o", download_template,
+      url
+    ),
+    stdout = TRUE,
+    stderr = TRUE
+  )
+
+  source_files <- list.files(
+    temp_folder,
+    pattern = "^source\\.",
+    full.names = TRUE
+  )
+
+  if (length(source_files) == 0) {
+    stop("Download failed for video: ", video_id)
+  }
+
+  source_file <- source_files[1]
+
+  # ----------------------------------------------------------
+  # CHECK DURATION
+  # ----------------------------------------------------------
+
+  duration <- get_duration(source_file)
+
+  if (is.na(duration) || duration <= 0) {
+    stop("Could not determine video duration: ", video_id)
+  }
+
+  message("Original duration: ", round(duration, 1), " seconds")
+
+  # ----------------------------------------------------------
+  # TRIM TO LAST 100 SECONDS
+  # ----------------------------------------------------------
+
+  start_time <- max(0, duration - MAX_DURATION)
+
+  message("Trimming video...")
+
+  trim_result <- system2(
+    FFMPEG,
+    args = c(
+      "-y",
+      "-ss", as.character(start_time),
+      "-i", source_file,
+      "-t", as.character(MAX_DURATION),
+      "-c:v", "libx264",
+      "-preset", "fast",
+      "-crf", "23",
+      "-c:a", "aac",
+      "-movflags", "+faststart",
+      output_file
+    ),
+    stdout = TRUE,
+    stderr = TRUE
+  )
+
+  if (!file.exists(output_file)) {
+    stop("FFmpeg failed to create video: ", video_id)
+  }
+
+  # ----------------------------------------------------------
+  # CHECK FILE SIZE
+  # ----------------------------------------------------------
+
+  file_size <- file.info(output_file)$size
+
+  message(
+    "Processed size: ",
+    round(file_size / 1000000, 2),
+    " MB"
+  )
+
+  if (file_size > MAXIMUM_SIZE) {
+    unlink(output_file)
+
+    stop(
+      "Video exceeds GitHub's 100 MB file limit: ",
+      video_id
+    )
+  }
+
+  message("SUCCESS: ", output_file)
+
+  invisible(output_file)
 }
 
+# ============================================================
+# MAIN
+# ============================================================
+
+message("Reading CSV: ", CSV_FILE)
+
+clips <- read.csv(
+  CSV_FILE,
+  stringsAsFactors = FALSE
+)
+
+if (!"player_url" %in% names(clips)) {
+  stop("CSV does not contain a player_url column")
+}
+
+# Remove empty URLs and duplicates
+urls <- unique(
+  clips$player_url[
+    !is.na(clips$player_url) &
+      nzchar(trimws(clips$player_url))
+  ]
+)
+
+message("Unique video URLs found: ", length(urls))
+
+# Extract video IDs
+video_ids <- vapply(
+  urls,
+  get_video_id,
+  character(1)
+)
+
+# Remove URLs without a recognizable video ID
+valid <- !is.na(video_ids)
+
+urls <- urls[valid]
+video_ids <- video_ids[valid]
+
+if (length(urls) == 0) {
+  stop("No valid Brightcove video URLs found")
+}
 
 # ------------------------------------------------------------
-# NORMALIZE VIDEO
+# PROCESS ALL VIDEOS
 # ------------------------------------------------------------
 
-normalize_video <- function(file) {
+success <- 0
+failed <- 0
 
-  duration <- get_duration(file)
+for (i in seq_along(urls)) {
 
-  if (duration > MAXIMUM_DURATION) {
+  message("")
+  message("VIDEO ", i, " OF ", length(urls))
 
-    message("Trimming video to last 100 seconds")
+  tryCatch({
 
-    trimmed <- trim(
-      file,
-      duration - MAXIMUM_DURATION,
-      duration
+    process_video(
+      url = urls[i],
+      video_id = video_ids[i]
     )
 
-    if (!file.copy(trimmed, file, overwrite = TRUE)) {
-      stop("Unable to replace original video")
-    }
+    success <- success + 1
 
-    unlink(trimmed)
-  }
+  }, error = function(e) {
 
-  size <- get_size(file)
-
-  if (size > MAXIMUM_SIZE) {
+    failed <<- failed + 1
 
     message(
-      "WARNING: Video exceeds 100 MB: ",
-      size
+      "FAILED: ",
+      video_ids[i],
+      " - ",
+      conditionMessage(e)
     )
-  }
 
-  invisible(file)
+  })
 }
 
-
 # ------------------------------------------------------------
-# READ VIDEO
-# ------------------------------------------------------------
-
-read_video <- function(file) {
-
-  if (!file.exists(file)) return(NULL)
-
-  con <- file(file, "rb")
-  on.exit(close(con))
-
-  readBin(
-    con,
-    what = "raw",
-    n = file.info(file)$size
-  )
-}
-
-
-# ------------------------------------------------------------
-# DELETE VIDEO
+# SUMMARY
 # ------------------------------------------------------------
 
-remove_video <- function(file) {
-
-  for (attempt in 1:DELETE_RETRY_ATTEMPTS) {
-
-    if (!file.exists(file)) return(invisible(NULL))
-
-    if (unlink(file) == 0) {
-      return(invisible(NULL))
-    }
-
-    if (attempt < DELETE_RETRY_ATTEMPTS) {
-      Sys.sleep(DELETE_RETRY_DELAY_SECONDS)
-    }
-  }
-
-  message("Unable to remove: ", file)
-
-  invisible(NULL)
-}
-
-
-# ============================================================
-# EXECUTION
-# ============================================================
-
-message("Starting NHL video download")
-
-download(video_url, filename)
-
-message("Original duration: ", get_duration(filename))
-
-normalize_video(filename)
-
-message("--------------------------------")
+message("")
+message("========================================")
 message("VIDEO PROCESSING COMPLETE")
-message("--------------------------------")
+message("Successful or already present: ", success)
+message("Failed: ", failed)
+message("========================================")
 
-message("File: ", filename)
-message("Duration: ", get_duration(filename), " seconds")
-message("Size: ", round(get_size(filename) / 1000000, 2), " MB")
-
-message("Ready for upload to GitHub artifact")
+if (failed > 0) {
+  stop("One or more videos failed. See log above.")
+}
