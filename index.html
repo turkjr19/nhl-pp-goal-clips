@@ -10,10 +10,6 @@
 
 <style>
 
-/* =====================================================
-   ONTARIO TECH RIDGEBACKS COLOURS
-===================================================== */
-
 :root {
   --navy: #003C71;
   --blue: #0077C8;
@@ -22,10 +18,6 @@
   --white: #FFFFFF;
   --text: #253449;
 }
-
-/* =====================================================
-   GENERAL
-===================================================== */
 
 * {
   box-sizing: border-box;
@@ -38,9 +30,7 @@ body {
   color: var(--text);
 }
 
-/* =====================================================
-   HEADER
-===================================================== */
+/* HEADER */
 
 header {
   background: #FFFFFF;
@@ -80,9 +70,7 @@ header {
   font-weight: bold;
 }
 
-/* =====================================================
-   MAIN CONTENT
-===================================================== */
+/* MAIN CONTENT */
 
 .container {
   max-width: 1100px;
@@ -115,9 +103,7 @@ header {
   font-weight: bold;
 }
 
-/* =====================================================
-   TABLE
-===================================================== */
+/* TABLE */
 
 .table-card {
   background: white;
@@ -163,14 +149,17 @@ tbody tr:hover {
   color: var(--navy);
 }
 
-.matchup {
-  font-weight: 600;
-  color: var(--text);
+.pp-team {
+  color: #16834A;
+  font-weight: bold;
 }
 
-/* =====================================================
-   WATCH CLIP BUTTON
-===================================================== */
+.pk-team {
+  color: var(--navy);
+  font-weight: bold;
+}
+
+/* WATCH CLIP BUTTON */
 
 .watch-button {
   display: inline-block;
@@ -183,6 +172,7 @@ tbody tr:hover {
   text-decoration: none;
   letter-spacing: 0.5px;
   transition: background 0.2s;
+  white-space: nowrap;
 }
 
 .watch-button:hover {
@@ -190,9 +180,7 @@ tbody tr:hover {
   color: white;
 }
 
-/* =====================================================
-   STATUS
-===================================================== */
+/* STATUS */
 
 #status {
   color: #66768A;
@@ -200,15 +188,7 @@ tbody tr:hover {
   margin: 15px 0;
 }
 
-.empty {
-  text-align: center;
-  padding: 35px;
-  color: #66768A;
-}
-
-/* =====================================================
-   FOOTER
-===================================================== */
+/* FOOTER */
 
 footer {
   background: var(--navy);
@@ -225,9 +205,7 @@ footer span {
   font-weight: bold;
 }
 
-/* =====================================================
-   MOBILE RESPONSIVE
-===================================================== */
+/* MOBILE */
 
 @media (max-width: 600px) {
 
@@ -254,7 +232,7 @@ footer span {
 
   .container {
     margin: 25px auto;
-    padding: 0 10px;
+    padding: 0 8px;
   }
 
   .section-heading h2 {
@@ -277,10 +255,6 @@ footer span {
 
 <body>
 
-<!-- =====================================================
-     HEADER
-===================================================== -->
-
 <header>
 
   <div class="header-inner">
@@ -294,7 +268,6 @@ footer span {
     <div class="header-title">
 
       <h1>RIDGEBACKS</h1>
-
       <h1>POWER PLAY CLIPS</h1>
 
       <p>NHL POWER PLAY GOAL DATABASE</p>
@@ -304,11 +277,6 @@ footer span {
   </div>
 
 </header>
-
-
-<!-- =====================================================
-     MAIN CONTENT
-===================================================== -->
 
 <main class="container">
 
@@ -331,29 +299,21 @@ footer span {
     <table>
 
       <thead>
-
         <tr>
           <th>Game Date</th>
-          <th>Matchup</th>
+          <th>PP</th>
+          <th>PK</th>
           <th>Video</th>
         </tr>
-
       </thead>
 
-      <tbody id="clips">
-
-      </tbody>
+      <tbody id="clips"></tbody>
 
     </table>
 
   </div>
 
 </main>
-
-
-<!-- =====================================================
-     FOOTER
-===================================================== -->
 
 <footer>
 
@@ -364,11 +324,6 @@ footer span {
   NHL POWER PLAY VIDEO DATABASE
 
 </footer>
-
-
-<!-- =====================================================
-     LOAD NHL CLIP CSV
-===================================================== -->
 
 <script>
 
@@ -390,7 +345,7 @@ async function loadClips() {
 
     const csv = await response.text();
 
-    // CSV parser
+    // Parse CSV including quoted fields
     function parseCSVLine(line) {
 
       const result = [];
@@ -455,7 +410,41 @@ async function loadClips() {
 
       });
 
-    // Sort newest game dates first
+    // Identify the opposing team using the matchup
+    function getOpponentTeam(matchup, scoringTeam) {
+
+      if (!matchup || !scoringTeam) {
+        return "";
+      }
+
+      const teams = matchup.split(
+        /\s+(?:@|vs\.?|v\.?|at|-)\s+/i
+      );
+
+      if (teams.length !== 2) {
+        return "";
+      }
+
+      const firstTeam = teams[0].trim();
+      const secondTeam = teams[1].trim();
+
+      const normalize = value =>
+        value.trim().toUpperCase().replace(/\./g, "");
+
+      const scoring = normalize(scoringTeam);
+
+      if (normalize(firstTeam) === scoring) {
+        return secondTeam;
+      }
+
+      if (normalize(secondTeam) === scoring) {
+        return firstTeam;
+      }
+
+      return "";
+    }
+
+    // Newest dates first
     rows.sort((a, b) =>
       b.game_date.localeCompare(a.game_date)
     );
@@ -472,11 +461,20 @@ async function loadClips() {
       date.className = "game-date";
       date.textContent = row.game_date;
 
-      // Matchup
-      const matchup = document.createElement("td");
+      // Power play team
+      const pp = document.createElement("td");
 
-      matchup.className = "matchup";
-      matchup.textContent = row.matchup;
+      pp.className = "pp-team";
+      pp.textContent = row.team || "";
+
+      // Penalty kill team
+      const pk = document.createElement("td");
+
+      pk.className = "pk-team";
+      pk.textContent = getOpponentTeam(
+        row.matchup,
+        row.team
+      );
 
       // Video link
       const clip = document.createElement("td");
@@ -499,7 +497,7 @@ async function loadClips() {
 
       }
 
-      tr.append(date, matchup, clip);
+      tr.append(date, pp, pk, clip);
 
       tbody.appendChild(tr);
 
@@ -521,7 +519,6 @@ async function loadClips() {
 
 }
 
-// Load clips when page opens
 loadClips();
 
 </script>
