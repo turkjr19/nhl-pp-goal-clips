@@ -2,190 +2,431 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NHL Power Play Goal Clips</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f3f5f8;
-      color: #202a36;
-      margin: 0;
-      padding: 30px 15px;
-    }
+<title>Ridgebacks | NHL Power Play Clips</title>
 
-    .container {
-      max-width: 950px;
-      margin: auto;
-    }
+<style>
+:root {
+  --navy: #003C71;
+  --blue: #0077C8;
+  --orange: #E75D2A;
+  --light: #F2F5F9;
+  --white: #FFFFFF;
+  --text: #253449;
+}
 
-    h1 {
-      margin-bottom: 5px;
-    }
+* {
+  box-sizing: border-box;
+}
 
-    .subtitle {
-      color: #657184;
-      margin-bottom: 25px;
-    }
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--light);
+  color: var(--text);
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-    }
+/* HEADER */
 
-    th, td {
-      padding: 15px;
-      text-align: left;
-      border-bottom: 1px solid #e5e9ef;
-    }
+header {
+  background: var(--navy);
+  color: white;
+  border-bottom: 6px solid var(--orange);
+}
 
-    th {
-      background: #172b4d;
-      color: white;
-    }
+.header-inner {
+  max-width: 1100px;
+  margin: auto;
+  padding: 22px 25px;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
 
-    tr:hover {
-      background: #f5f8fc;
-    }
+.logo {
+  width: 125px;
+  height: 125px;
+  object-fit: contain;
+}
 
-    a {
-      color: #1769aa;
-      font-weight: bold;
-      text-decoration: none;
-    }
+.header-title h1 {
+  margin: 0;
+  font-size: 30px;
+  letter-spacing: 2px;
+  font-weight: 800;
+}
 
-    a:hover {
-      text-decoration: underline;
-    }
+.header-title p {
+  margin: 8px 0 0;
+  color: #D9E7F3;
+  font-size: 13px;
+  letter-spacing: 2px;
+}
 
-    #status {
-      margin: 15px 0;
-      color: #657184;
-    }
+/* MAIN CONTENT */
 
-    @media (max-width: 600px) {
-      th, td {
-        padding: 10px 7px;
-        font-size: 13px;
-      }
-    }
-  </style>
+.container {
+  max-width: 1100px;
+  margin: 35px auto;
+  padding: 0 20px;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.section-heading h2 {
+  color: var(--navy);
+  font-size: 22px;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.count {
+  background: var(--navy);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+/* TABLE */
+
+.table-card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.07);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: var(--navy);
+  color: white;
+}
+
+th {
+  padding: 17px 20px;
+  text-align: left;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+td {
+  padding: 17px 20px;
+  border-bottom: 1px solid #E5EAF0;
+  font-size: 14px;
+}
+
+tbody tr:nth-child(even) {
+  background: #F5F8FC;
+}
+
+tbody tr:hover {
+  background: #E8F2FA;
+}
+
+.game-date {
+  font-weight: bold;
+  color: var(--navy);
+}
+
+.matchup {
+  font-weight: 600;
+}
+
+/* WATCH BUTTON */
+
+.watch-button {
+  display: inline-block;
+  background: var(--orange);
+  color: white;
+  padding: 9px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  transition: background 0.2s;
+}
+
+.watch-button:hover {
+  background: var(--navy);
+  color: white;
+}
+
+/* STATUS */
+
+#status {
+  color: #66768A;
+  font-size: 13px;
+  margin: 15px 0;
+}
+
+.empty {
+  text-align: center;
+  padding: 35px;
+  color: #66768A;
+}
+
+/* FOOTER */
+
+footer {
+  background: var(--navy);
+  color: white;
+  text-align: center;
+  padding: 22px;
+  margin-top: 60px;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+footer span {
+  color: var(--orange);
+  font-weight: bold;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+  .header-inner {
+    padding: 16px;
+    gap: 14px;
+  }
+
+  .logo {
+    width: 85px;
+    height: 85px;
+  }
+
+  .header-title h1 {
+    font-size: 21px;
+  }
+
+  .header-title p {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+
+  .container {
+    margin: 25px auto;
+    padding: 0 10px;
+  }
+
+  th, td {
+    padding: 12px 9px;
+    font-size: 12px;
+  }
+
+  .watch-button {
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+}
+</style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>NHL Power Play Goal Clips</h1>
-    <div class="subtitle">Daily collection of NHL power-play goals</div>
 
-    <div id="status">Loading clips...</div>
+<header>
+  <div class="header-inner">
 
+    <img
+      class="logo"
+      src="https://assets.ontariotechu.ca/logos/spirit/ridgeback-primary-wordmark/colour/ridgebacks_primary_rgb_72ppi.png"
+      alt="Ontario Tech Ridgebacks logo"
+    >
+
+    <div class="header-title">
+      <h1>RIDGEBACKS</h1>
+      <h1>POWER PLAY CLIPS</h1>
+      <p>NHL POWER PLAY GOAL DATABASE</p>
+    </div>
+
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="section-heading">
+    <h2>LATEST POWER PLAY GOALS</h2>
+    <div class="count" id="count">Loading...</div>
+  </div>
+
+  <div id="status">Loading clips...</div>
+
+  <div class="table-card">
     <table>
       <thead>
         <tr>
           <th>Game Date</th>
           <th>Matchup</th>
-          <th>Clip</th>
+          <th>Video</th>
         </tr>
       </thead>
-      <tbody id="clips"></tbody>
+
+      <tbody id="clips">
+      </tbody>
     </table>
   </div>
 
-  <script>
-    async function loadClips() {
-      const status = document.getElementById("status");
-      const tbody = document.getElementById("clips");
+</main>
 
-      try {
-        const response = await fetch("pp_goal_clips.csv?t=" + Date.now());
+<footer>
+  <span>ONTARIO TECH RIDGEBACKS</span>
+  &nbsp; | &nbsp; NHL POWER PLAY VIDEO DATABASE
+</footer>
 
-        if (!response.ok) {
-          throw new Error("Could not load CSV");
-        }
+<script>
 
-        const csv = await response.text();
-        const lines = csv.trim().split(/\r?\n/);
+async function loadClips() {
 
-        if (lines.length <= 1) {
-          status.textContent = "No clips available yet.";
-          return;
-        }
+  const status = document.getElementById("status");
+  const tbody = document.getElementById("clips");
+  const count = document.getElementById("count");
 
-        function parseCSVLine(line) {
-          const result = [];
-          let value = "";
-          let quoted = false;
+  try {
 
-          for (let i = 0; i < line.length; i++) {
-            const char = line[i];
+    const response = await fetch(
+      "pp_goal_clips.csv?t=" + Date.now()
+    );
 
-            if (char === '"') {
-              if (quoted && line[i + 1] === '"') {
-                value += '"';
-                i++;
-              } else {
-                quoted = !quoted;
-              }
-            } else if (char === "," && !quoted) {
-              result.push(value);
-              value = "";
-            } else {
-              value += char;
-            }
-          }
-
-          result.push(value);
-          return result;
-        }
-
-        const headers = parseCSVLine(lines[0]);
-        const rows = lines.slice(1).filter(line => line.trim() !== "")
-          .map(line => {
-            const values = parseCSVLine(line);
-            return Object.fromEntries(
-              headers.map((header, i) => [header, values[i] || ""])
-            );
-          });
-
-        rows.sort((a, b) =>
-          b.game_date.localeCompare(a.game_date)
-        );
-
-        tbody.innerHTML = "";
-
-        rows.forEach(row => {
-          const tr = document.createElement("tr");
-
-          const date = document.createElement("td");
-          date.textContent = row.game_date;
-
-          const matchup = document.createElement("td");
-          matchup.textContent = row.matchup;
-
-          const clip = document.createElement("td");
-          const link = document.createElement("a");
-          link.href = row.clip_url;
-          link.textContent = "Watch Clip";
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-
-          clip.appendChild(link);
-          tr.append(date, matchup, clip);
-          tbody.appendChild(tr);
-        });
-
-        status.textContent = rows.length + " power-play goal clips";
-
-      } catch (error) {
-        status.textContent = "Error loading clips: " + error.message;
-      }
+    if (!response.ok) {
+      throw new Error("Could not load CSV");
     }
 
-    loadClips();
-  </script>
+    const csv = await response.text();
+
+    function parseCSVLine(line) {
+
+      const result = [];
+      let value = "";
+      let quoted = false;
+
+      for (let i = 0; i < line.length; i++) {
+
+        const char = line[i];
+
+        if (char === '"') {
+
+          if (quoted && line[i + 1] === '"') {
+            value += '"';
+            i++;
+          } else {
+            quoted = !quoted;
+          }
+
+        } else if (char === "," && !quoted) {
+
+          result.push(value);
+          value = "";
+
+        } else {
+          value += char;
+        }
+      }
+
+      result.push(value);
+      return result;
+    }
+
+    const lines = csv.trim().split(/\r?\n/);
+
+    if (lines.length <= 1) {
+      status.textContent = "No clips available yet.";
+      count.textContent = "0 CLIPS";
+      return;
+    }
+
+    const headers = parseCSVLine(lines[0]);
+
+    const rows = lines.slice(1)
+      .filter(line => line.trim() !== "")
+      .map(line => {
+
+        const values = parseCSVLine(line);
+
+        return Object.fromEntries(
+          headers.map((header, i) => [
+            header,
+            values[i] || ""
+          ])
+        );
+      });
+
+    // Newest games first
+    rows.sort((a, b) =>
+      b.game_date.localeCompare(a.game_date)
+    );
+
+    tbody.innerHTML = "";
+
+    rows.forEach(row => {
+
+      const tr = document.createElement("tr");
+
+      const date = document.createElement("td");
+      date.className = "game-date";
+      date.textContent = row.game_date;
+
+      const matchup = document.createElement("td");
+      matchup.className = "matchup";
+      matchup.textContent = row.matchup;
+
+      const clip = document.createElement("td");
+
+      if (row.clip_url) {
+
+        const link = document.createElement("a");
+
+        link.href = row.clip_url;
+        link.textContent = "WATCH CLIP";
+        link.className = "watch-button";
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+
+        clip.appendChild(link);
+
+      } else {
+        clip.textContent = "Unavailable";
+      }
+
+      tr.append(date, matchup, clip);
+      tbody.appendChild(tr);
+
+    });
+
+    count.textContent = rows.length + " CLIPS";
+
+    status.textContent =
+      "Showing all available power-play goal clips";
+
+  } catch (error) {
+
+    status.textContent =
+      "Error loading clips: " + error.message;
+
+    count.textContent = "ERROR";
+
+  }
+}
+
+loadClips();
+
+</script>
+
 </body>
 </html>
