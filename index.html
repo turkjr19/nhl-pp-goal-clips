@@ -272,34 +272,35 @@ tbody tr:hover {
 
 .video-modal-content {
   width: min(100%, 1000px);
-  background: #FFFFFF;
+  background: #000000;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 12px 40px rgba(0,0,0,0.35);
 }
 
+/* CLEAN VIDEO HEADER - CLOSE BUTTON ONLY */
+
 .video-modal-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  gap: 15px;
-  padding: 14px 18px;
+  padding: 8px 14px;
   background: var(--navy);
-  color: white;
-}
-
-.video-modal-title {
-  font-weight: bold;
-  font-size: 15px;
 }
 
 .video-close {
   border: 0;
   background: transparent;
   color: white;
-  font-size: 28px;
+  font-size: 30px;
   line-height: 1;
   cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+
+.video-close:hover {
+  color: var(--orange);
 }
 
 .video-player {
@@ -309,9 +310,13 @@ tbody tr:hover {
   background: #000000;
 }
 
-.video-message {
+/* VIDEO ERROR MESSAGE */
+
+.video-error {
+  display: none;
   padding: 14px 18px;
-  color: #66768A;
+  background: #FFFFFF;
+  color: #B42318;
   font-size: 13px;
 }
 
@@ -400,11 +405,7 @@ footer span {
   }
 
   .video-modal-header {
-    padding: 12px;
-  }
-
-  .video-modal-title {
-    font-size: 13px;
+    padding: 8px 12px;
   }
 
 }
@@ -525,23 +526,21 @@ footer span {
 </main>
 
 
-<!-- VIDEO PLAYER MODAL -->
+<!-- CLEAN VIDEO PLAYER MODAL -->
 
 <div
   class="video-modal"
   id="videoModal"
   role="dialog"
   aria-modal="true"
-  aria-labelledby="videoModalTitle"
+  aria-label="Hockey goal video player"
 >
 
   <div class="video-modal-content">
 
-    <div class="video-modal-header">
+    <!-- ONLY THE CLOSE BUTTON -->
 
-      <div class="video-modal-title" id="videoModalTitle">
-        Hockey Goal Clip
-      </div>
+    <div class="video-modal-header">
 
       <button
         class="video-close"
@@ -554,6 +553,8 @@ footer span {
 
     </div>
 
+    <!-- VIDEO -->
+
     <video
       class="video-player"
       id="clipPlayer"
@@ -564,9 +565,13 @@ footer span {
       Your browser does not support HTML video.
     </video>
 
-    <div class="video-message" id="videoMessage">
-      Processed MP4 clip
-    </div>
+    <!-- ONLY SHOWN IF VIDEO FAILS -->
+
+    <div
+      class="video-error"
+      id="videoError"
+      role="alert"
+    ></div>
 
   </div>
 
@@ -681,8 +686,6 @@ function getOpponentTeam(matchup, scoringTeam) {
 
 function getVideoId(row) {
 
-  // First check for a dedicated video ID column.
-
   let videoId = (
     row.video_id ||
     row.videoId ||
@@ -693,9 +696,6 @@ function getVideoId(row) {
   if (videoId) {
     return videoId;
   }
-
-  // Check player_url first.
-  // This is where the R script stores the Brightcove video ID.
 
   const sourceUrls = [
     row.player_url,
@@ -742,8 +742,6 @@ function getVideoId(row) {
 
 function getProcessedClipUrl(row) {
 
-  // Allow an explicit MP4 path if supplied.
-
   if (row.processed_clip_url) {
     return row.processed_clip_url.trim();
   }
@@ -753,9 +751,6 @@ function getProcessedClipUrl(row) {
   if (!videoId) {
     return "";
   }
-
-  // GitHub repository location:
-  // videos/VIDEO_ID.mp4
 
   return "videos/" +
     encodeURIComponent(videoId) +
@@ -793,7 +788,6 @@ function displayClips() {
     }
 
     const ppTeam = (row.team || "").toUpperCase();
-
     const pkTeam = (row.pk_team || "").toUpperCase();
 
     if (filter === "pp") {
@@ -886,14 +880,7 @@ function displayClips() {
 
       button.addEventListener("click", function() {
 
-        openVideo(
-          processedClipUrl,
-          row.game_date + " | " +
-          (row.team || "") +
-          " PP vs " +
-          (row.pk_team || "") +
-          " PK"
-        );
+        openVideo(processedClipUrl);
 
       });
 
@@ -939,46 +926,36 @@ function displayClips() {
 // OPEN VIDEO PLAYER
 // --------------------------------------------------
 
-function openVideo(videoUrl, title) {
+function openVideo(videoUrl) {
 
   const modal = document.getElementById("videoModal");
-
   const player = document.getElementById("clipPlayer");
+  const error = document.getElementById("videoError");
 
-  const heading =
-    document.getElementById("videoModalTitle");
+  // Hide any previous error.
 
-  const message =
-    document.getElementById("videoMessage");
+  error.style.display = "none";
+  error.textContent = "";
 
-
-  heading.textContent = title || "Hockey Goal Clip";
-
-  message.textContent = "Loading processed MP4 clip...";
-
+  // Reset the previous video.
 
   player.pause();
-
   player.removeAttribute("src");
-
   player.load();
 
+  // Display an error only if the video cannot load.
 
   player.onerror = function() {
 
-    message.textContent =
-      "This processed clip could not be loaded. " +
+    error.textContent =
+      "This clip could not be loaded. " +
       "Check that the MP4 exists in the videos folder.";
 
-  };
-
-
-  player.onloadedmetadata = function() {
-
-    message.textContent = "Processed MP4 clip";
+    error.style.display = "block";
 
   };
 
+  // Load the selected video.
 
   player.src = videoUrl;
 
@@ -987,7 +964,6 @@ function openVideo(videoUrl, title) {
   document.body.style.overflow = "hidden";
 
   player.load();
-
 
   player.play().catch(function() {
     // Browser may require the user to press Play.
@@ -1003,14 +979,17 @@ function openVideo(videoUrl, title) {
 function closeVideo() {
 
   const modal = document.getElementById("videoModal");
-
   const player = document.getElementById("clipPlayer");
+  const error = document.getElementById("videoError");
 
   player.pause();
 
   player.removeAttribute("src");
 
   player.load();
+
+  error.style.display = "none";
+  error.textContent = "";
 
   modal.classList.remove("open");
 
@@ -1026,7 +1005,6 @@ function closeVideo() {
 async function loadClips() {
 
   const status = document.getElementById("status");
-
   const count = document.getElementById("count");
 
   try {
