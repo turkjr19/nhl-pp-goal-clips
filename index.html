@@ -240,7 +240,9 @@ tbody tr:hover {
   border-radius: 4px;
   font-size: 12px;
   font-weight: bold;
-  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
   letter-spacing: 0.5px;
   transition: background 0.2s;
   white-space: nowrap;
@@ -251,13 +253,8 @@ tbody tr:hover {
   color: white;
 }
 
+/* VIDEO PLAYER */
 
-/* PROCESSED VIDEO PLAYER */
-.watch-button {
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-}
 .video-modal {
   display: none;
   position: fixed;
@@ -268,7 +265,11 @@ tbody tr:hover {
   align-items: center;
   justify-content: center;
 }
-.video-modal.open { display: flex; }
+
+.video-modal.open {
+  display: flex;
+}
+
 .video-modal-content {
   width: min(100%, 1000px);
   background: #FFFFFF;
@@ -276,6 +277,7 @@ tbody tr:hover {
   overflow: hidden;
   box-shadow: 0 12px 40px rgba(0,0,0,0.35);
 }
+
 .video-modal-header {
   display: flex;
   justify-content: space-between;
@@ -285,7 +287,12 @@ tbody tr:hover {
   background: var(--navy);
   color: white;
 }
-.video-modal-title { font-weight: bold; font-size: 15px; }
+
+.video-modal-title {
+  font-weight: bold;
+  font-size: 15px;
+}
+
 .video-close {
   border: 0;
   background: transparent;
@@ -294,25 +301,21 @@ tbody tr:hover {
   line-height: 1;
   cursor: pointer;
 }
+
 .video-player {
   display: block;
   width: 100%;
   max-height: 75vh;
   background: #000000;
 }
+
 .video-message {
   padding: 14px 18px;
   color: #66768A;
   font-size: 13px;
 }
-@media (max-width: 600px) {
-  .video-modal { padding: 8px; }
-  .video-modal-header { padding: 12px; }
-  .video-modal-title { font-size: 13px; }
-}
 
 /* STATUS */
-
 
 #status {
   color: #66768A;
@@ -391,6 +394,19 @@ footer span {
     padding: 8px 10px;
     font-size: 10px;
   }
+
+  .video-modal {
+    padding: 8px;
+  }
+
+  .video-modal-header {
+    padding: 12px;
+  }
+
+  .video-modal-title {
+    font-size: 13px;
+  }
+
 }
 
 </style>
@@ -509,20 +525,51 @@ footer span {
 </main>
 
 
-<!-- PROCESSED VIDEO PLAYER MODAL -->
-<div class="video-modal" id="videoModal" role="dialog"
-     aria-modal="true" aria-labelledby="videoModalTitle">
+<!-- VIDEO PLAYER MODAL -->
+
+<div
+  class="video-modal"
+  id="videoModal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="videoModalTitle"
+>
+
   <div class="video-modal-content">
+
     <div class="video-modal-header">
-      <div class="video-modal-title" id="videoModalTitle">Hockey Goal Clip</div>
-      <button class="video-close" id="closeVideo" type="button"
-              aria-label="Close video">&times;</button>
+
+      <div class="video-modal-title" id="videoModalTitle">
+        Hockey Goal Clip
+      </div>
+
+      <button
+        class="video-close"
+        id="closeVideo"
+        type="button"
+        aria-label="Close video"
+      >
+        &times;
+      </button>
+
     </div>
-    <video class="video-player" id="clipPlayer" controls playsinline preload="metadata">
+
+    <video
+      class="video-player"
+      id="clipPlayer"
+      controls
+      playsinline
+      preload="metadata"
+    >
       Your browser does not support HTML video.
     </video>
-    <div class="video-message" id="videoMessage">Processed MP4 clip</div>
+
+    <div class="video-message" id="videoMessage">
+      Processed MP4 clip
+    </div>
+
   </div>
+
 </div>
 
 
@@ -544,6 +591,7 @@ footer span {
 <script>
 
 let allClips = [];
+
 
 // --------------------------------------------------
 // CSV PARSER
@@ -584,6 +632,7 @@ function parseCSVLine(line) {
   result.push(value);
 
   return result;
+
 }
 
 
@@ -622,6 +671,96 @@ function getOpponentTeam(matchup, scoringTeam) {
   }
 
   return "";
+
+}
+
+
+// --------------------------------------------------
+// GET VIDEO ID FROM CSV ROW
+// --------------------------------------------------
+
+function getVideoId(row) {
+
+  // First check for a dedicated video ID column.
+
+  let videoId = (
+    row.video_id ||
+    row.videoId ||
+    row.brightcove_video_id ||
+    ""
+  ).toString().trim();
+
+  if (videoId) {
+    return videoId;
+  }
+
+  // Check player_url first.
+  // This is where the R script stores the Brightcove video ID.
+
+  const sourceUrls = [
+    row.player_url,
+    row.clip_url
+  ];
+
+  for (const source of sourceUrls) {
+
+    if (!source) continue;
+
+    try {
+
+      const sourceUrl = new URL(source);
+
+      videoId =
+        sourceUrl.searchParams.get("videoId") || "";
+
+    } catch (error) {
+
+      const found = source.match(
+        /[?&]videoId=(\d+)/i
+      );
+
+      if (found) {
+        videoId = found[1];
+      }
+
+    }
+
+    if (videoId) {
+      return videoId;
+    }
+
+  }
+
+  return "";
+
+}
+
+
+// --------------------------------------------------
+// FIND PROCESSED MP4
+// --------------------------------------------------
+
+function getProcessedClipUrl(row) {
+
+  // Allow an explicit MP4 path if supplied.
+
+  if (row.processed_clip_url) {
+    return row.processed_clip_url.trim();
+  }
+
+  const videoId = getVideoId(row);
+
+  if (!videoId) {
+    return "";
+  }
+
+  // GitHub repository location:
+  // videos/VIDEO_ID.mp4
+
+  return "videos/" +
+    encodeURIComponent(videoId) +
+    ".mp4";
+
 }
 
 
@@ -644,7 +783,9 @@ function displayClips() {
     .getElementById("teamFilter")
     .value;
 
-  // Filter clips by PP or PK team
+
+  // Filter clips by PP or PK team.
+
   const filteredClips = allClips.filter(row => {
 
     if (!search) {
@@ -652,6 +793,7 @@ function displayClips() {
     }
 
     const ppTeam = (row.team || "").toUpperCase();
+
     const pkTeam = (row.pk_team || "").toUpperCase();
 
     if (filter === "pp") {
@@ -669,16 +811,18 @@ function displayClips() {
 
   });
 
+
   tbody.innerHTML = "";
 
-  // No results
+
+  // No results.
+
   if (filteredClips.length === 0) {
 
     const tr = document.createElement("tr");
     const td = document.createElement("td");
 
     td.colSpan = 4;
-    td.className = "empty";
     td.textContent = "No clips found for this search.";
 
     tr.appendChild(td);
@@ -690,51 +834,77 @@ function displayClips() {
       "Try another team abbreviation or filter.";
 
     return;
+
   }
 
-  // Display results
+
+  // Display results.
+
   filteredClips.forEach(row => {
 
     const tr = document.createElement("tr");
 
-    // Game date
+
+    // Game date.
+
     const date = document.createElement("td");
 
     date.className = "game-date";
-    date.textContent = row.game_date;
+    date.textContent = row.game_date || "";
 
-    // PP team
+
+    // PP team.
+
     const pp = document.createElement("td");
 
     pp.className = "pp-team";
     pp.textContent = row.team || "";
 
-    // PK team
+
+    // PK team.
+
     const pk = document.createElement("td");
 
     pk.className = "pk-team";
     pk.textContent = row.pk_team || "";
 
-    // Play the processed MP4 stored in the repository's videos/ folder
+
+    // Video button.
+
     const clip = document.createElement("td");
-    const processedClipUrl = getProcessedClipUrl(row);
+
+    const processedClipUrl =
+      getProcessedClipUrl(row);
 
     if (processedClipUrl) {
+
       const button = document.createElement("button");
+
       button.type = "button";
       button.textContent = "WATCH CLIP";
       button.className = "watch-button";
+
       button.addEventListener("click", function() {
+
         openVideo(
           processedClipUrl,
-          row.game_date + " | " + (row.team || "") +
-            " PP vs " + (row.pk_team || "") + " PK"
+          row.game_date + " | " +
+          (row.team || "") +
+          " PP vs " +
+          (row.pk_team || "") +
+          " PK"
         );
+
       });
+
       clip.appendChild(button);
+
     } else {
-      clip.textContent = "Not processed";
+
+      clip.textContent = "Video ID unavailable";
+
     }
+
 
     tr.append(date, pp, pk, clip);
 
@@ -742,8 +912,13 @@ function displayClips() {
 
   });
 
+
   count.textContent =
-    filteredClips.length + " OF " + allClips.length + " CLIPS";
+    filteredClips.length +
+    " OF " +
+    allClips.length +
+    " CLIPS";
+
 
   if (search) {
 
@@ -761,99 +936,97 @@ function displayClips() {
 
 
 // --------------------------------------------------
-// --------------------------------------------------
-// FIND THE PROCESSED MP4 FOR A CSV ROW
-// --------------------------------------------------
-
-function getProcessedClipUrl(row) {
-
-  // Optional explicit path supplied by the CSV.
-  if (row.processed_clip_url) {
-    return row.processed_clip_url.trim();
-  }
-
-  // Prefer an explicit video ID column if present.
-  let videoId = (
-    row.video_id ||
-    row.videoId ||
-    row.brightcove_video_id ||
-    ""
-  ).toString().trim();
-
-  // Otherwise extract videoId from the existing Brightcove clip_url.
-  if (!videoId && row.clip_url) {
-    try {
-      const sourceUrl = new URL(row.clip_url);
-      videoId = sourceUrl.searchParams.get("videoId") || "";
-    } catch (error) {
-      const found = row.clip_url.match(/[?&]videoId=(\\d+)/i);
-      if (found) videoId = found[1];
-    }
-  }
-
-  if (!videoId) return "";
-
-  // Expected repository location: videos/<Brightcove video ID>.mp4
-  return "videos/" + encodeURIComponent(videoId) + ".mp4";
-}
-
-
-// --------------------------------------------------
-// OPEN AND CLOSE THE VIDEO PLAYER
+// OPEN VIDEO PLAYER
 // --------------------------------------------------
 
 function openVideo(videoUrl, title) {
+
   const modal = document.getElementById("videoModal");
+
   const player = document.getElementById("clipPlayer");
-  const heading = document.getElementById("videoModalTitle");
-  const message = document.getElementById("videoMessage");
+
+  const heading =
+    document.getElementById("videoModalTitle");
+
+  const message =
+    document.getElementById("videoMessage");
+
 
   heading.textContent = title || "Hockey Goal Clip";
+
   message.textContent = "Loading processed MP4 clip...";
 
+
   player.pause();
+
   player.removeAttribute("src");
+
   player.load();
+
 
   player.onerror = function() {
+
     message.textContent =
-      "This processed clip could not be loaded. It may not have been uploaded to the repository yet.";
+      "This processed clip could not be loaded. " +
+      "Check that the MP4 exists in the videos folder.";
+
   };
+
 
   player.onloadedmetadata = function() {
+
     message.textContent = "Processed MP4 clip";
+
   };
 
+
   player.src = videoUrl;
+
   modal.classList.add("open");
+
   document.body.style.overflow = "hidden";
+
   player.load();
 
-  // The user clicked WATCH CLIP, so playback can be attempted.
+
   player.play().catch(function() {
-    // Some browsers may require the user to press Play.
+    // Browser may require the user to press Play.
   });
+
 }
 
+
+// --------------------------------------------------
+// CLOSE VIDEO PLAYER
+// --------------------------------------------------
+
 function closeVideo() {
+
   const modal = document.getElementById("videoModal");
+
   const player = document.getElementById("clipPlayer");
 
   player.pause();
+
   player.removeAttribute("src");
+
   player.load();
 
   modal.classList.remove("open");
+
   document.body.style.overflow = "";
+
 }
 
 
+// --------------------------------------------------
 // LOAD CSV
 // --------------------------------------------------
 
 async function loadClips() {
 
   const status = document.getElementById("status");
+
   const count = document.getElementById("count");
 
   try {
@@ -870,45 +1043,61 @@ async function loadClips() {
 
     const lines = csv.trim().split(/\r?\n/);
 
+
     if (lines.length <= 1) {
 
       status.textContent = "No clips available yet.";
+
       count.textContent = "0 CLIPS";
 
       return;
+
     }
+
 
     const headers = parseCSVLine(lines[0]);
 
+
     allClips = lines.slice(1)
+
       .filter(line => line.trim() !== "")
+
       .map(line => {
 
         const values = parseCSVLine(line);
 
         const row = Object.fromEntries(
+
           headers.map((header, i) => [
             header,
             values[i] || ""
           ])
+
         );
 
-        // Calculate opposing PK team
+
+        // Calculate opposing PK team.
+
         row.pk_team = getOpponentTeam(
           row.matchup,
           row.team
         );
 
+
         return row;
 
       });
 
-    // Newest dates first
+
+    // Newest dates first.
+
     allClips.sort((a, b) =>
       b.game_date.localeCompare(a.game_date)
     );
 
+
     displayClips();
+
 
   } catch (error) {
 
@@ -930,15 +1119,18 @@ document
   .getElementById("teamSearch")
   .addEventListener("input", displayClips);
 
+
 document
   .getElementById("teamFilter")
   .addEventListener("change", displayClips);
+
 
 document
   .getElementById("clearSearch")
   .addEventListener("click", function() {
 
     document.getElementById("teamSearch").value = "";
+
     document.getElementById("teamFilter").value = "both";
 
     displayClips();
@@ -946,21 +1138,39 @@ document
   });
 
 
-// Close the embedded video player.
-document.getElementById("closeVideo")
+// --------------------------------------------------
+// VIDEO PLAYER EVENTS
+// --------------------------------------------------
+
+document
+  .getElementById("closeVideo")
   .addEventListener("click", closeVideo);
 
-document.getElementById("videoModal")
+
+document
+  .getElementById("videoModal")
   .addEventListener("click", function(event) {
-    if (event.target.id === "videoModal") closeVideo();
+
+    if (event.target.id === "videoModal") {
+      closeVideo();
+    }
+
   });
 
+
 document.addEventListener("keydown", function(event) {
-  if (event.key === "Escape") closeVideo();
+
+  if (event.key === "Escape") {
+    closeVideo();
+  }
+
 });
 
 
-// Load clips when page opens
+// --------------------------------------------------
+// LOAD CLIPS WHEN PAGE OPENS
+// --------------------------------------------------
+
 loadClips();
 
 </script>
