@@ -1,0 +1,46 @@
+
+name: Download and Trim Hockey Video
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: "Brightcove video URL"
+        required: true
+        type: string
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install yt-dlp
+        run: |
+          python -m pip install --user --upgrade yt-dlp
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Run video processing
+        env:
+          VIDEO_URL: ${{ inputs.video_url }}
+          OUTPUT_FILE: nhl_goal.mp4
+        run: |
+          Rscript video_processing.R
+
+      - name: Upload processed video
+        uses: actions/upload-artifact@v4
+        with:
+          name: processed-hockey-video
+          path: nhl_goal.mp4
+          if-no-files-found: error
+          retention-days: 7
