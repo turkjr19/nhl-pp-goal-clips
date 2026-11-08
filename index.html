@@ -1,6 +1,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,6 +9,11 @@
 <title>Ridgebacks | NHL Power Play Clips</title>
 
 <style>
+
+/* =====================================================
+   ONTARIO TECH RIDGEBACKS COLOURS
+===================================================== */
+
 :root {
   --navy: #003C71;
   --blue: #0077C8;
@@ -16,6 +22,10 @@
   --white: #FFFFFF;
   --text: #253449;
 }
+
+/* =====================================================
+   GENERAL
+===================================================== */
 
 * {
   box-sizing: border-box;
@@ -28,12 +38,14 @@ body {
   color: var(--text);
 }
 
-/* HEADER */
+/* =====================================================
+   HEADER
+===================================================== */
 
 header {
-  background: var(--navy);
-  color: white;
-  border-bottom: 6px solid var(--orange);
+  background: #FFFFFF;
+  color: var(--navy);
+  border-bottom: 7px solid var(--orange);
 }
 
 .header-inner {
@@ -42,30 +54,35 @@ header {
   padding: 22px 25px;
   display: flex;
   align-items: center;
-  gap: 25px;
+  gap: 30px;
 }
 
 .logo {
-  width: 125px;
-  height: 125px;
+  width: 145px;
+  height: 145px;
   object-fit: contain;
 }
 
 .header-title h1 {
   margin: 0;
-  font-size: 30px;
+  color: var(--navy);
+  font-size: 32px;
   letter-spacing: 2px;
   font-weight: 800;
+  line-height: 1.2;
 }
 
 .header-title p {
-  margin: 8px 0 0;
-  color: #D9E7F3;
-  font-size: 13px;
+  margin: 10px 0 0;
+  color: var(--blue);
+  font-size: 14px;
   letter-spacing: 2px;
+  font-weight: bold;
 }
 
-/* MAIN CONTENT */
+/* =====================================================
+   MAIN CONTENT
+===================================================== */
 
 .container {
   max-width: 1100px;
@@ -98,7 +115,9 @@ header {
   font-weight: bold;
 }
 
-/* TABLE */
+/* =====================================================
+   TABLE
+===================================================== */
 
 .table-card {
   background: white;
@@ -146,9 +165,12 @@ tbody tr:hover {
 
 .matchup {
   font-weight: 600;
+  color: var(--text);
 }
 
-/* WATCH BUTTON */
+/* =====================================================
+   WATCH CLIP BUTTON
+===================================================== */
 
 .watch-button {
   display: inline-block;
@@ -168,7 +190,9 @@ tbody tr:hover {
   color: white;
 }
 
-/* STATUS */
+/* =====================================================
+   STATUS
+===================================================== */
 
 #status {
   color: #66768A;
@@ -182,7 +206,9 @@ tbody tr:hover {
   color: #66768A;
 }
 
-/* FOOTER */
+/* =====================================================
+   FOOTER
+===================================================== */
 
 footer {
   background: var(--navy);
@@ -199,21 +225,26 @@ footer span {
   font-weight: bold;
 }
 
-/* MOBILE */
+/* =====================================================
+   MOBILE RESPONSIVE
+===================================================== */
 
 @media (max-width: 600px) {
+
   .header-inner {
     padding: 16px;
-    gap: 14px;
+    gap: 15px;
   }
 
   .logo {
-    width: 85px;
-    height: 85px;
+    width: 90px;
+    height: 90px;
   }
 
   .header-title h1 {
-    font-size: 21px;
+    font-size: 19px;
+    color: var(--navy);
+    letter-spacing: 1px;
   }
 
   .header-title p {
@@ -226,6 +257,10 @@ footer span {
     padding: 0 10px;
   }
 
+  .section-heading h2 {
+    font-size: 17px;
+  }
+
   th, td {
     padding: 12px 9px;
     font-size: 12px;
@@ -236,59 +271,104 @@ footer span {
     font-size: 10px;
   }
 }
+
 </style>
 </head>
 
 <body>
 
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
 <header>
+
   <div class="header-inner">
 
     <img
-  class="logo"
-  src="ridgebacks-logo.png"
-  alt="Ontario Tech Ridgebacks logo"
->
+      class="logo"
+      src="ridgebacks-logo.png"
+      alt="Ontario Tech Ridgebacks logo"
+    >
 
     <div class="header-title">
+
       <h1>RIDGEBACKS</h1>
+
       <h1>POWER PLAY CLIPS</h1>
+
       <p>NHL POWER PLAY GOAL DATABASE</p>
+
     </div>
 
   </div>
+
 </header>
+
+
+<!-- =====================================================
+     MAIN CONTENT
+===================================================== -->
 
 <main class="container">
 
   <div class="section-heading">
+
     <h2>LATEST POWER PLAY GOALS</h2>
-    <div class="count" id="count">Loading...</div>
+
+    <div class="count" id="count">
+      Loading...
+    </div>
+
   </div>
 
-  <div id="status">Loading clips...</div>
+  <div id="status">
+    Loading clips...
+  </div>
 
   <div class="table-card">
+
     <table>
+
       <thead>
+
         <tr>
           <th>Game Date</th>
           <th>Matchup</th>
           <th>Video</th>
         </tr>
+
       </thead>
 
       <tbody id="clips">
+
       </tbody>
+
     </table>
+
   </div>
 
 </main>
 
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
 <footer>
+
   <span>ONTARIO TECH RIDGEBACKS</span>
-  &nbsp; | &nbsp; NHL POWER PLAY VIDEO DATABASE
+
+  &nbsp; | &nbsp;
+
+  NHL POWER PLAY VIDEO DATABASE
+
 </footer>
+
+
+<!-- =====================================================
+     LOAD NHL CLIP CSV
+===================================================== -->
 
 <script>
 
@@ -310,6 +390,7 @@ async function loadClips() {
 
     const csv = await response.text();
 
+    // CSV parser
     function parseCSVLine(line) {
 
       const result = [];
@@ -335,19 +416,25 @@ async function loadClips() {
           value = "";
 
         } else {
+
           value += char;
+
         }
+
       }
 
       result.push(value);
+
       return result;
     }
 
     const lines = csv.trim().split(/\r?\n/);
 
     if (lines.length <= 1) {
+
       status.textContent = "No clips available yet.";
       count.textContent = "0 CLIPS";
+
       return;
     }
 
@@ -365,9 +452,10 @@ async function loadClips() {
             values[i] || ""
           ])
         );
+
       });
 
-    // Newest games first
+    // Sort newest game dates first
     rows.sort((a, b) =>
       b.game_date.localeCompare(a.game_date)
     );
@@ -378,14 +466,19 @@ async function loadClips() {
 
       const tr = document.createElement("tr");
 
+      // Game date
       const date = document.createElement("td");
+
       date.className = "game-date";
       date.textContent = row.game_date;
 
+      // Matchup
       const matchup = document.createElement("td");
+
       matchup.className = "matchup";
       matchup.textContent = row.matchup;
 
+      // Video link
       const clip = document.createElement("td");
 
       if (row.clip_url) {
@@ -401,10 +494,13 @@ async function loadClips() {
         clip.appendChild(link);
 
       } else {
+
         clip.textContent = "Unavailable";
+
       }
 
       tr.append(date, matchup, clip);
+
       tbody.appendChild(tr);
 
     });
@@ -422,8 +518,10 @@ async function loadClips() {
     count.textContent = "ERROR";
 
   }
+
 }
 
+// Load clips when page opens
 loadClips();
 
 </script>
