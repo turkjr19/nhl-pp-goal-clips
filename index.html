@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
 <title>Power Play Clips | Ridgebacks</title>
+
 <style>
 :root {
   --navy:#173e70;
@@ -15,55 +16,95 @@
   --muted:#6e7f94;
   --text:#24354a;
 }
-* {box-sizing:border-box}
-html {-webkit-text-size-adjust:100%}
+
+* { box-sizing:border-box; }
+html { -webkit-text-size-adjust:100%; }
+[hidden] { display:none !important; }
+
 body {
   margin:0;
   background:var(--bg);
   color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
 }
-button,input,select {font:inherit}
-button {cursor:pointer}
-button:disabled {opacity:.4;cursor:not-allowed}
-button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible {
+
+button,input,select { font:inherit; }
+button { cursor:pointer; }
+button:disabled { opacity:.4;cursor:not-allowed; }
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
   outline:3px solid #1684c9;
   outline-offset:2px;
 }
+
 .container {
   width:min(1080px,calc(100% - 28px));
   margin:auto;
 }
+
 header {
   background:white;
   border-bottom:3px solid var(--orange);
 }
+
 .header-inner {
   display:flex;
   align-items:center;
   gap:12px;
   min-height:78px;
 }
-.logo {width:62px;height:62px;object-fit:contain}
+
+.logo {
+  width:62px;
+  height:62px;
+  object-fit:contain;
+}
+
 .brand {
   font-size:19px;
   font-weight:800;
   letter-spacing:1px;
   color:var(--navy);
 }
-.hero {padding:25px 0 20px}
+
+.header-spacer { flex:1; }
+
+.mode-button {
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:white;
+  color:var(--navy);
+  font-size:12px;
+  font-weight:800;
+  padding:11px 15px;
+  white-space:nowrap;
+}
+
+.mode-button.active {
+  background:var(--navy);
+  border-color:var(--navy);
+  color:white;
+}
+
+.hero { padding:25px 0 20px; }
+
 .nhl-heading {
   display:flex;
   align-items:center;
   gap:14px;
   min-width:0;
 }
+
 .nhl-heading img {
   width:58px;
   height:58px;
   object-fit:contain;
   flex-shrink:0;
 }
+
 .nhl-heading h1 {
   margin:0;
   font-size:clamp(23px,4vw,34px);
@@ -71,6 +112,9 @@ header {
   color:var(--navy);
   letter-spacing:-.7px;
 }
+
+/* VIDEO LIBRARY */
+
 .library {
   background:white;
   border:1px solid var(--border);
@@ -79,26 +123,38 @@ header {
   margin-bottom:40px;
   box-shadow:0 4px 22px #193c6010;
 }
-.library-header {padding:20px 22px 15px}
+
+.library-header { padding:20px 22px 15px; }
+
 .library-header h2 {
   margin:0;
   font-size:21px;
   color:var(--navy);
 }
+
 .filters {
   display:grid;
   grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr) auto;
   gap:10px;
   padding:0 22px 19px;
 }
-.field {display:flex;flex-direction:column;gap:6px;min-width:0}
+
+.field {
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width:0;
+}
+
 .field label {
   font-size:10px;
   font-weight:750;
   color:var(--muted);
   letter-spacing:.3px;
 }
-.field input,.field select {
+
+.field input,
+.field select {
   width:100%;
   min-width:0;
   height:44px;
@@ -109,7 +165,9 @@ header {
   color:var(--text);
   font-size:13px;
 }
-.field input[type=date] {color-scheme:light}
+
+.field input[type=date] { color-scheme:light; }
+
 .clear-button {
   align-self:end;
   height:44px;
@@ -121,6 +179,7 @@ header {
   font-size:12px;
   font-weight:750;
 }
+
 .view-bar {
   display:flex;
   justify-content:space-between;
@@ -131,7 +190,9 @@ header {
   border-top:1px solid var(--border);
   border-bottom:1px solid var(--border);
 }
-.view-buttons {display:flex;gap:7px}
+
+.view-buttons { display:flex;gap:7px; }
+
 .view-button {
   border:1px solid var(--border);
   border-radius:7px;
@@ -141,14 +202,18 @@ header {
   font-size:12px;
   font-weight:750;
 }
+
 .view-button.active {
   background:var(--navy);
   border-color:var(--navy);
   color:white;
 }
-.result-count {font-size:12px;color:var(--muted)}
-table {width:100%;border-collapse:collapse}
-thead {background:#fafbfd}
+
+.result-count { font-size:12px;color:var(--muted); }
+
+table { width:100%;border-collapse:collapse; }
+thead { background:#fafbfd; }
+
 th {
   text-align:left;
   color:var(--muted);
@@ -157,14 +222,27 @@ th {
   letter-spacing:.5px;
   padding:13px 19px;
 }
+
 td {
   padding:12px 19px;
   border-top:1px solid var(--border);
   font-size:13px;
 }
-tbody tr:hover {background:#f9fbfe}
-.date-main {font-size:13px;font-weight:800;color:var(--navy)}
-.date-year {font-size:11px;color:var(--muted);margin-top:3px}
+
+tbody tr:hover { background:#f9fbfe; }
+
+.date-main {
+  font-size:13px;
+  font-weight:800;
+  color:var(--navy);
+}
+
+.date-year {
+  font-size:11px;
+  color:var(--muted);
+  margin-top:3px;
+}
+
 .team-pill {
   display:inline-flex;
   align-items:center;
@@ -181,20 +259,28 @@ tbody tr:hover {background:#f9fbfe}
   font-weight:800;
   white-space:nowrap;
 }
+
 .team-pill.pp {
   background:#f0f8f2;
   border-color:#deebdf;
   color:var(--green);
 }
+
 .team-pill.selected {
   outline:2px solid var(--navy);
   outline-offset:1px;
 }
-.team-pill:hover {border-color:#91acc8;background:#e9f2fb}
+
+.team-pill:hover {
+  border-color:#91acc8;
+  background:#e9f2fb;
+}
+
 .team-pill span:last-child {
   overflow:hidden;
   text-overflow:ellipsis;
 }
+
 .team-logo {
   display:block;
   width:30px;
@@ -202,6 +288,7 @@ tbody tr:hover {background:#f9fbfe}
   object-fit:contain;
   flex-shrink:0;
 }
+
 .team-fallback {
   display:none;
   width:30px;
@@ -213,8 +300,10 @@ tbody tr:hover {background:#f9fbfe}
   justify-content:center;
   font-size:9px;
 }
-.logo-failed .team-logo {display:none}
-.logo-failed .team-fallback {display:flex}
+
+.logo-failed .team-logo { display:none; }
+.logo-failed .team-fallback { display:flex; }
+
 .watch-button {
   border:0;
   border-radius:8px;
@@ -225,7 +314,9 @@ tbody tr:hover {background:#f9fbfe}
   font-weight:800;
   white-space:nowrap;
 }
-.watch-button:hover {background:var(--navy)}
+
+.watch-button:hover { background:var(--navy); }
+
 .save-button {
   width:39px;
   height:39px;
@@ -235,14 +326,29 @@ tbody tr:hover {background:#f9fbfe}
   color:#8a99a9;
   font-size:24px;
 }
+
 .save-button.saved {
   color:var(--orange);
   background:#fff6f1;
   border-color:#f1c7b7;
 }
-.empty {padding:45px 15px;text-align:center}
-.empty strong {display:block;color:var(--navy);font-size:15px}
-.empty p {font-size:12px;color:var(--muted)}
+
+.empty {
+  padding:45px 15px;
+  text-align:center;
+}
+
+.empty strong {
+  display:block;
+  color:var(--navy);
+  font-size:15px;
+}
+
+.empty p {
+  font-size:12px;
+  color:var(--muted);
+}
+
 .pagination {
   display:flex;
   align-items:center;
@@ -251,8 +357,10 @@ tbody tr:hover {background:#f9fbfe}
   padding:14px 22px;
   border-top:1px solid var(--border);
 }
-.page-info {font-size:12px;color:var(--muted)}
-.page-buttons {display:flex;gap:7px}
+
+.page-info { font-size:12px;color:var(--muted); }
+.page-buttons { display:flex;gap:7px; }
+
 .page-button {
   border:1px solid var(--border);
   border-radius:7px;
@@ -262,6 +370,190 @@ tbody tr:hover {background:#f9fbfe}
   font-size:12px;
   font-weight:750;
 }
+
+/* TEAM MODE */
+
+.team-mode {
+  display:none;
+  margin-bottom:40px;
+}
+
+.team-mode.active { display:block; }
+
+.team-panel {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:22px;
+  box-shadow:0 4px 22px #193c6010;
+}
+
+.team-panel-heading {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.team-panel-heading h2 {
+  margin:0;
+  color:var(--navy);
+  font-size:22px;
+}
+
+.team-panel-heading p {
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.team-actions {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.back-button {
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:white;
+  color:var(--navy);
+  padding:10px 13px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.clear-team-button {
+  border:1px solid #f0c8b8;
+  border-radius:8px;
+  background:#fff5ef;
+  color:#b74b28;
+  padding:10px 13px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.clear-team-button:hover { background:#ffe7da; }
+
+.team-grid {
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:12px;
+}
+
+.team-card {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  min-width:0;
+  min-height:116px;
+  padding:13px 8px;
+  border:1px solid var(--border);
+  border-radius:11px;
+  background:#f9fbfd;
+  color:var(--navy);
+  font-size:12px;
+  font-weight:800;
+}
+
+.team-card:hover {
+  background:#edf4fb;
+  border-color:#9bb5d0;
+}
+
+.team-card img {
+  width:66px;
+  height:66px;
+  object-fit:contain;
+}
+
+.team-card span { font-size:12px; }
+
+.scorer-grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+}
+
+.scorer-card {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+  padding:17px 10px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:#f9fbfd;
+  color:var(--navy);
+  text-align:center;
+}
+
+.scorer-card:hover {
+  border-color:#9bb5d0;
+  background:#edf4fb;
+}
+
+.scorer-headshot {
+  width:105px;
+  height:105px;
+  border-radius:50%;
+  background:#e9eef4;
+  object-fit:contain;
+}
+
+.scorer-name {
+  font-size:13px;
+  font-weight:800;
+}
+
+.scorer-count {
+  color:var(--muted);
+  font-size:11px;
+  font-weight:700;
+}
+
+.scorer-goals {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.goal-card {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:#fafbfd;
+}
+
+.goal-details {
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:0;
+}
+
+.goal-date {
+  font-size:13px;
+  font-weight:800;
+  color:var(--navy);
+}
+
+.goal-opponent {
+  font-size:12px;
+  color:var(--muted);
+}
+
+/* VIDEO MODAL */
+
 .video-modal {
   position:fixed;
   inset:0;
@@ -272,73 +564,126 @@ tbody tr:hover {background:#f9fbfe}
   padding:12px;
   background:rgba(0,13,30,.92);
 }
-.video-modal.open {display:flex}
+
+.video-modal.open { display:flex; }
+
 .video-box {
+  position:relative;
   width:min(100%,1000px);
   border-radius:11px;
   overflow:hidden;
   background:black;
 }
+
 .video-header {
-  height:46px;
+  position:absolute;
+  top:10px;
+  right:10px;
+  z-index:2;
+  pointer-events:none;
+}
+
+.video-close {
   display:flex;
   align-items:center;
-  justify-content:flex-end;
-  padding:0 10px;
-  background:var(--navy);
-}
-.video-close {
+  justify-content:center;
+  width:38px;
+  height:38px;
   border:0;
-  background:transparent;
+  border-radius:50%;
+  background:rgba(0,0,0,.65);
   color:white;
-  font-size:30px;
-  padding:4px 10px;
+  font-size:29px;
+  line-height:1;
+  padding:0;
+  pointer-events:auto;
 }
-.video-player {display:block;width:100%;max-height:75dvh;background:black}
-.video-error {display:none;background:#fff2ef;color:#a51d14;padding:14px}
+
+.video-close:hover { background:rgba(0,0,0,.9); }
+
+.video-player {
+  display:block;
+  width:100%;
+  max-height:85dvh;
+  background:black;
+}
+
+.video-error {
+  display:none;
+  background:#fff2ef;
+  color:#a51d14;
+  padding:14px;
+}
+
+/* FOOTER */
+
 footer {
   background:white;
   border-top:1px solid var(--border);
   padding:26px 12px 34px;
   text-align:center;
 }
+
 .footer-title {
   font-size:11px;
   font-weight:800;
   color:var(--navy);
   letter-spacing:.5px;
 }
-.contributors {margin-top:10px;font-size:11px;color:var(--muted)}
-.contributors a {color:var(--navy);font-weight:750;text-decoration:none}
-.contributors a:hover {text-decoration:underline}
 
-/* TABLETS */
-@media(max-width:760px) {
-  .filters {grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-  .search-field,.clear-button {grid-column:1/-1}
+.contributors {
+  margin-top:10px;
+  font-size:11px;
+  color:var(--muted);
 }
 
-/* IPHONE AND ANDROID */
+.contributors a {
+  color:var(--navy);
+  font-weight:750;
+  text-decoration:none;
+}
+
+.contributors a:hover { text-decoration:underline; }
+
+/* RESPONSIVE */
+
+@media(max-width:900px) {
+  .team-grid { grid-template-columns:repeat(5,minmax(0,1fr)); }
+  .scorer-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+}
+
+@media(max-width:760px) {
+  .filters {
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  }
+
+  .search-field,.clear-button { grid-column:1/-1; }
+  .team-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+}
+
 @media(max-width:650px) {
-  .container {width:calc(100% - 20px)}
-  .header-inner {min-height:66px;gap:9px}
-  .logo {width:49px;height:49px}
-  .brand {font-size:16px}
-  .hero {padding:20px 3px 16px}
-  .nhl-heading {gap:10px}
-  .nhl-heading img {width:42px;height:42px}
-  .nhl-heading h1 {font-size:clamp(20px,5.7vw,27px)}
-  .library {border-radius:10px;margin-bottom:25px}
-  .library-header {padding:15px 13px 12px}
-  .library-header h2 {font-size:19px}
-  .filters {gap:9px;padding:0 13px 14px}
-  .field input,.field select {height:43px;padding:0 9px;font-size:13px}
-  .clear-button {height:40px}
-  .view-bar {padding:10px 13px;flex-wrap:wrap}
-  .view-button {font-size:11px;padding:9px 12px}
-  .result-count {font-size:11px}
-  table,tbody {display:block;width:100%}
-  thead {display:none}
+  .container { width:calc(100% - 20px); }
+  .header-inner { min-height:66px;gap:9px; }
+  .logo { width:49px;height:49px; }
+  .brand { font-size:16px; }
+  .mode-button { padding:9px 10px;font-size:11px; }
+  .hero { padding:20px 3px 16px; }
+  .nhl-heading { gap:10px; }
+  .nhl-heading img { width:42px;height:42px; }
+  .nhl-heading h1 { font-size:clamp(20px,5.7vw,27px); }
+  .library { border-radius:10px;margin-bottom:25px; }
+  .library-header { padding:15px 13px 12px; }
+  .library-header h2 { font-size:19px; }
+  .filters { gap:9px;padding:0 13px 14px; }
+  .field input,.field select { height:43px;padding:0 9px;font-size:13px; }
+  .clear-button { height:40px; }
+  .view-bar { padding:10px 13px;flex-wrap:wrap; }
+  .view-button { font-size:11px;padding:9px 12px; }
+  .result-count { font-size:11px; }
+
+  table,tbody { display:block;width:100%; }
+  thead { display:none; }
+
   tbody tr {
     display:grid;
     grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;
@@ -348,53 +693,78 @@ footer {
     padding:12px 13px;
     border-top:1px solid var(--border);
   }
-  td {display:block;min-width:0;padding:0;border:0}
-  td:nth-child(1) {grid-column:1/3;grid-row:1}
-  .date-main {font-size:12px}
-  .date-year {display:inline;font-size:10px}
-  td:nth-child(2) {grid-column:1;grid-row:2}
-  td:nth-child(3) {grid-column:2;grid-row:2}
-  td:nth-child(2)::before,td:nth-child(3)::before {
+
+  td { display:block;min-width:0;padding:0;border:0; }
+  td:nth-child(1) { grid-column:1/3;grid-row:1; }
+  .date-main { font-size:12px; }
+  .date-year { display:inline;font-size:10px; }
+  td:nth-child(2) { grid-column:1;grid-row:2; }
+  td:nth-child(3) { grid-column:2;grid-row:2; }
+
+  td:nth-child(2)::before,
+  td:nth-child(3)::before {
     display:block;
     margin-bottom:4px;
     color:var(--muted);
     font-size:9px;
     font-weight:800;
   }
-  td:nth-child(2)::before {content:"PP TEAM"}
-  td:nth-child(3)::before {content:"PK TEAM"}
-  .team-pill {min-height:37px;gap:4px;padding:4px;font-size:11px}
-  .team-logo,.team-fallback {width:25px;height:25px}
-  td:nth-child(4) {grid-column:3;grid-row:2}
-  .watch-button {padding:10px 9px;font-size:10px}
-  td:nth-child(5) {grid-column:3;grid-row:1;text-align:right}
-  .save-button {width:34px;height:34px;font-size:21px}
-  tbody tr:has(td[colspan]) {display:block}
-  .pagination {padding:12px 13px}
-  .page-info {font-size:10px}
-  .page-button {font-size:11px;padding:9px 10px}
-  .video-modal {padding:7px}
-  .footer-title {font-size:10px}
+
+  td:nth-child(2)::before { content:"PP TEAM"; }
+  td:nth-child(3)::before { content:"PK TEAM"; }
+
+  .team-pill { min-height:37px;gap:4px;padding:4px;font-size:11px; }
+  .team-logo,.team-fallback { width:25px;height:25px; }
+  td:nth-child(4) { grid-column:3;grid-row:2; }
+  .watch-button { padding:10px 9px;font-size:10px; }
+  td:nth-child(5) { grid-column:3;grid-row:1;text-align:right; }
+  .save-button { width:34px;height:34px;font-size:21px; }
+  tbody tr:has(td[colspan]) { display:block; }
+
+  .pagination { padding:12px 13px; }
+  .page-info { font-size:10px; }
+  .page-button { font-size:11px;padding:9px 10px; }
+
+  .team-panel { padding:14px; }
+  .team-panel-heading h2 { font-size:18px; }
+  .team-grid { grid-template-columns:repeat(3,minmax(0,1fr));gap:8px; }
+  .team-card { min-height:95px;padding:10px 5px; }
+  .team-card img { width:52px;height:52px; }
+  .scorer-grid { grid-template-columns:repeat(2,minmax(0,1fr));gap:9px; }
+  .scorer-headshot { width:88px;height:88px; }
+  .goal-card { padding:11px; }
+  .video-modal { padding:7px; }
+  .footer-title { font-size:10px; }
+
+  .team-actions button {
+    font-size:11px;
+    padding:9px 11px;
+  }
 }
+
 @media(max-width:360px) {
-  .container {width:calc(100% - 14px)}
-  .nhl-heading img {width:36px;height:36px}
-  .nhl-heading h1 {font-size:20px}
-  .filters {gap:7px;padding-inline:10px}
+  .container { width:calc(100% - 14px); }
+  .nhl-heading img { width:36px;height:36px; }
+  .nhl-heading h1 { font-size:20px; }
+  .filters { gap:7px;padding-inline:10px; }
+
   tbody tr {
     grid-template-columns:minmax(0,1fr) minmax(0,1fr) 65px;
     padding:11px 9px;
     gap:8px 4px;
   }
-  .team-pill {font-size:10px;gap:3px;padding:4px 3px}
-  .team-logo,.team-fallback {width:23px;height:23px}
-  .watch-button {padding:9px 5px;font-size:9px}
+
+  .team-pill { font-size:10px;gap:3px;padding:4px 3px; }
+  .team-logo,.team-fallback { width:23px;height:23px; }
+  .watch-button { padding:9px 5px;font-size:9px; }
 }
+
 @media(prefers-reduced-motion:reduce) {
-  * {scroll-behavior:auto!important;transition:none!important}
+  * { scroll-behavior:auto!important;transition:none!important; }
 }
 </style>
 </head>
+
 <body>
 
 <header>
@@ -402,21 +772,22 @@ footer {
     <img class="logo" src="ridgebacks-logo.png"
          alt="Ontario Tech Ridgebacks">
     <div class="brand">RIDGEBACKS</div>
+    <div class="header-spacer"></div>
+    <button id="modeButton" class="mode-button"
+            type="button">Team Mode</button>
   </div>
 </header>
 
 <main class="container">
   <section class="hero">
     <div class="nhl-heading">
-      <img
-        src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg"
-        alt="NHL logo"
-      >
+      <img src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg"
+           alt="NHL logo">
       <h1>Power Play Clips</h1>
     </div>
   </section>
 
-  <section class="library">
+  <section id="videoLibrary" class="library">
     <div class="library-header">
       <h2>Video Library</h2>
     </div>
@@ -428,10 +799,12 @@ footer {
                placeholder="Search team (e.g. TOR)"
                autocomplete="off">
       </div>
+
       <div class="field">
         <label for="dateFilter">GAME DATE</label>
         <input id="dateFilter" type="date">
       </div>
+
       <div class="field">
         <label for="teamFilter">TEAM TYPE</label>
         <select id="teamFilter">
@@ -440,6 +813,7 @@ footer {
           <option value="pk">PK Team</option>
         </select>
       </div>
+
       <button class="clear-button" id="clearButton"
               type="button">Clear Filters</button>
     </div>
@@ -482,6 +856,37 @@ footer {
         <button class="page-button" id="nextPage"
                 type="button">Next</button>
       </div>
+    </div>
+  </section>
+
+  <section id="teamMode" class="team-mode">
+    <div class="team-panel">
+      <div class="team-panel-heading">
+        <div>
+          <h2 id="teamModeTitle">Select an NHL Team</h2>
+          <p id="teamModeSubtitle">
+            Browse power-play goals by team and player.
+          </p>
+        </div>
+
+        <div class="team-actions">
+          <button id="teamBackButton"
+                  class="back-button"
+                  type="button" hidden>
+            Back
+          </button>
+
+          <button id="clearTeamButton"
+                  class="clear-team-button"
+                  type="button" hidden>
+            Clear Team
+          </button>
+        </div>
+      </div>
+
+      <div id="teamGrid" class="team-grid"></div>
+      <div id="scorerGrid" class="scorer-grid" hidden></div>
+      <div id="scorerGoals" class="scorer-goals" hidden></div>
     </div>
   </section>
 </main>
@@ -529,6 +934,14 @@ let selectedTeam = "";
 let lastFocus = null;
 let savedClips = new Set();
 
+let teamModeEnabled = false;
+let teamModeLevel = "teams";
+let teamModeTeam = "";
+let teamModeScorer = "";
+
+const rosterCache = new Map();
+const headshotCache = new Map();
+
 try {
   const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
   if (Array.isArray(stored)) {
@@ -536,7 +949,40 @@ try {
   }
 } catch (e) {}
 
-/* NHL TEAM LOGOS */
+const NHL_TEAMS = [
+  ["ANA","Anaheim Ducks"],
+  ["BOS","Boston Bruins"],
+  ["BUF","Buffalo Sabres"],
+  ["CAR","Carolina Hurricanes"],
+  ["CBJ","Columbus Blue Jackets"],
+  ["CGY","Calgary Flames"],
+  ["CHI","Chicago Blackhawks"],
+  ["COL","Colorado Avalanche"],
+  ["DAL","Dallas Stars"],
+  ["DET","Detroit Red Wings"],
+  ["EDM","Edmonton Oilers"],
+  ["FLA","Florida Panthers"],
+  ["LAK","Los Angeles Kings"],
+  ["MIN","Minnesota Wild"],
+  ["MTL","Montreal Canadiens"],
+  ["NJD","New Jersey Devils"],
+  ["NSH","Nashville Predators"],
+  ["NYI","New York Islanders"],
+  ["NYR","New York Rangers"],
+  ["OTT","Ottawa Senators"],
+  ["PHI","Philadelphia Flyers"],
+  ["PIT","Pittsburgh Penguins"],
+  ["SEA","Seattle Kraken"],
+  ["SJS","San Jose Sharks"],
+  ["STL","St. Louis Blues"],
+  ["TBL","Tampa Bay Lightning"],
+  ["TOR","Toronto Maple Leafs"],
+  ["UTA","Utah Mammoth"],
+  ["VAN","Vancouver Canucks"],
+  ["VGK","Vegas Golden Knights"],
+  ["WPG","Winnipeg Jets"],
+  ["WSH","Washington Capitals"]
+];
 
 const TEAM_CODES = {
   ANA:"ANA", ARI:"UTA", ATL:"WPG", BOS:"BOS",
@@ -554,8 +1000,11 @@ const TEAM_CODES = {
 
 function escapeHTML(value) {
   return String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;", "<":"&lt;", ">":"&gt;",
-    '"':"&quot;", "'":"&#39;"
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
   })[c]);
 }
 
@@ -571,7 +1020,7 @@ const yesterday = new Date();
 yesterday.setDate(yesterday.getDate()-1);
 $("dateFilter").value = localDateString(yesterday);
 
-/* CSV PARSER */
+/* CSV */
 
 function parseCSV(text) {
   const rows = [];
@@ -594,7 +1043,9 @@ function parseCSV(text) {
       if (row.some(x => x.trim())) rows.push(row);
       row = [];
       cell = "";
-    } else cell += c;
+    } else {
+      cell += c;
+    }
   }
 
   row.push(cell);
@@ -604,60 +1055,86 @@ function parseCSV(text) {
 
 function getOpponentTeam(matchup, team) {
   if (!matchup || !team) return "";
+
   const parts = matchup.split(/\s+(?:@|vs\.?|v\.?|at|-)\s+/i);
   if (parts.length !== 2) return "";
+
   const norm = x => x.trim().toUpperCase().replace(/\./g,"");
+
   if (norm(parts[0]) === norm(team)) return parts[1].trim();
   if (norm(parts[1]) === norm(team)) return parts[0].trim();
+
   return "";
 }
 
 function getVideoId(row) {
   let id = String(
-    row.video_id || row.videoId ||
-    row.brightcove_video_id || ""
+    row.video_id ||
+    row.videoId ||
+    row.brightcove_video_id ||
+    ""
   ).trim();
 
   if (id) return id;
 
-  for (const source of [row.player_url, row.clip_url]) {
+  for (const source of [row.player_url,row.clip_url]) {
     if (!source) continue;
+
     try {
-      id = new URL(source, location.href)
+      id = new URL(source,location.href)
         .searchParams.get("videoId") || "";
     } catch(e) {
       const match = String(source).match(/[?&]videoId=(\d+)/i);
       id = match ? match[1] : "";
     }
+
     if (id) return id;
   }
+
   return "";
 }
 
 function getClipUrl(row) {
-  if (row.processed_clip_url) return row.processed_clip_url.trim();
+  if (row.processed_clip_url)
+    return row.processed_clip_url.trim();
+
   const id = getVideoId(row);
-  return id ? "videos/" + encodeURIComponent(id) + ".mp4" : "";
+
+  return id
+    ? "videos/" + encodeURIComponent(id) + ".mp4"
+    : "";
 }
 
 function clipKey(row) {
-  return [row.game_date,row.team,row.pk_team,row.videoUrl].join("|");
+  return [
+    row.game_date,
+    row.team,
+    row.pk_team,
+    row.videoUrl
+  ].join("|");
 }
 
 function formatDate(value) {
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(value || ""));
-  if (!m) return {main:value || "Unknown",year:""};
+
+  if (!m) return {
+    main:value || "Unknown",
+    year:""
+  };
 
   const d = new Date(Date.UTC(+m[1],+m[2]-1,+m[3]));
+
   return {
     main:d.toLocaleDateString("en-CA",{
-      month:"short",day:"numeric",timeZone:"UTC"
+      month:"short",
+      day:"numeric",
+      timeZone:"UTC"
     }),
     year:m[1]
   };
 }
 
-/* CLICKABLE TEAM LOGOS */
+/* VIDEO LIBRARY */
 
 function teamHTML(team,isPP) {
   const name = escapeHTML(team || "—");
@@ -683,8 +1160,6 @@ function teamHTML(team,isPP) {
     </button>
   `;
 }
-
-/* FILTERING */
 
 function applyFilters(reset=true) {
   if (reset) currentPage=0;
@@ -713,6 +1188,7 @@ function applyFilters(reset=true) {
 
     if (type==="pp") return pp.includes(query);
     if (type==="pk") return pk.includes(query);
+
     return pp.includes(query) || pk.includes(query);
   });
 
@@ -722,8 +1198,6 @@ function applyFilters(reset=true) {
 
   renderClips();
 }
-
-/* DISPLAY CLIPS */
 
 function renderClips() {
   const start=currentPage*PAGE_SIZE;
@@ -782,8 +1256,6 @@ function renderClips() {
   $("nextPage").disabled=start+PAGE_SIZE>=filteredClips.length;
 }
 
-/* TEAM SELECTION */
-
 function syncView() {
   $("allButton").classList.toggle("active",currentView==="all");
   $("savedButton").classList.toggle("active",currentView==="saved");
@@ -807,12 +1279,14 @@ function openVideo(url) {
   if (!url) return;
 
   lastFocus=document.activeElement;
+
   const player=$("clipPlayer");
   const modal=$("videoModal");
   const error=$("videoError");
 
   error.style.display="none";
   error.textContent="";
+
   player.pause();
   player.removeAttribute("src");
   player.load();
@@ -826,7 +1300,9 @@ function openVideo(url) {
   modal.classList.add("open");
   modal.setAttribute("aria-hidden","false");
   document.body.style.overflow="hidden";
+
   $("closeVideo").focus();
+
   player.load();
   player.play().catch(()=>{});
 }
@@ -836,28 +1312,340 @@ function closeVideo() {
   if (!modal.classList.contains("open")) return;
 
   const player=$("clipPlayer");
+
   player.pause();
   player.removeAttribute("src");
   player.load();
+
   modal.classList.remove("open");
   modal.setAttribute("aria-hidden","true");
   document.body.style.overflow="";
 
-  if (lastFocus && lastFocus.isConnected) lastFocus.focus();
+  if (lastFocus && lastFocus.isConnected)
+    lastFocus.focus();
 }
 
 /* SAVED CLIPS */
 
 function toggleSaved(row) {
   const key=clipKey(row);
+
   if (savedClips.has(key)) savedClips.delete(key);
   else savedClips.add(key);
 
   try {
-    localStorage.setItem(STORAGE_KEY,JSON.stringify([...savedClips]));
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify([...savedClips])
+    );
   } catch(e) {}
 
   applyFilters(false);
+}
+
+/* TEAM MODE */
+
+function normalizeName(name) {
+  return String(name || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .replace(/[.'’]/g,"")
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]/g," ")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function getScorerName(row) {
+  return String(
+    row.scorer ||
+    row.goal_scorer ||
+    row.player_name ||
+    ""
+  ).trim();
+}
+
+function getTeamName(code) {
+  return NHL_TEAMS.find(t=>t[0]===code)?.[1] || code;
+}
+
+function teamGoals(code) {
+  return allClips.filter(row =>
+    (TEAM_CODES[String(row.team || "").toUpperCase()] ||
+      String(row.team || "").toUpperCase())===code
+  );
+}
+
+function getScorers(code) {
+  const map=new Map();
+
+  for (const row of teamGoals(code)) {
+    const name=getScorerName(row);
+    if (!name) continue;
+
+    const key=normalizeName(name);
+
+    if (!map.has(key)) {
+      map.set(key,{
+        name,
+        key,
+        goals:[]
+      });
+    }
+
+    map.get(key).goals.push(row);
+  }
+
+  return [...map.values()].sort((a,b)=>
+    b.goals.length-a.goals.length ||
+    a.name.localeCompare(b.name)
+  );
+}
+
+function flattenRoster(data) {
+  return [
+    ...(data.forwards || []),
+    ...(data.defensemen || []),
+    ...(data.goalies || [])
+  ];
+}
+
+async function loadRoster(code) {
+  if (rosterCache.has(code))
+    return rosterCache.get(code);
+
+  const season="20262027";
+  const url=`https://api-web.nhle.com/v1/roster/${code}/${season}`;
+
+  try {
+    const response=await fetch(url);
+
+    if (!response.ok)
+      throw new Error("Roster unavailable");
+
+    const data=await response.json();
+    const players=flattenRoster(data);
+
+    rosterCache.set(code,players);
+    return players;
+  } catch(e) {
+    console.warn("Roster request failed:",code,e);
+    rosterCache.set(code,[]);
+    return [];
+  }
+}
+
+function playerDisplayName(player) {
+  const first=player.firstName?.default || "";
+  const last=player.lastName?.default || "";
+  return `${first} ${last}`.trim();
+}
+
+function matchPlayer(scorer,players) {
+  const wanted=normalizeName(scorer);
+  const parts=wanted.split(" ").filter(Boolean);
+
+  if (parts.length<2) return null;
+
+  const initial=parts[0][0];
+  const surname=parts.slice(1).join(" ");
+
+  const matches=players.filter(player=>{
+    const first=normalizeName(
+      player.firstName?.default || ""
+    );
+
+    const last=normalizeName(
+      player.lastName?.default || ""
+    );
+
+    const full=`${first} ${last}`.trim();
+
+    return (
+      full===wanted ||
+      (last===surname && first.startsWith(initial))
+    );
+  });
+
+  return matches.length===1 ? matches[0] : null;
+}
+
+async function resolveHeadshots(code) {
+  const players=await loadRoster(code);
+  const scorers=getScorers(code);
+
+  for (const scorer of scorers) {
+    const player=matchPlayer(scorer.name,players);
+
+    if (!player) {
+      console.warn(
+        "No unique NHL roster match:",
+        code,
+        scorer.name
+      );
+      continue;
+    }
+
+    const url=player.headshot ||
+      `https://assets.nhle.com/mugs/nhl/20262027/${code}/${player.id}.png`;
+
+    headshotCache.set(`${code}|${scorer.key}`,url);
+  }
+
+  if (
+    teamModeEnabled &&
+    teamModeLevel==="scorers" &&
+    teamModeTeam===code
+  ) {
+    renderScorers(code);
+  }
+}
+
+function renderTeams() {
+  teamModeLevel="teams";
+  teamModeTeam="";
+  teamModeScorer="";
+
+  $("teamModeTitle").textContent="Select an NHL Team";
+  $("teamModeSubtitle").textContent=
+    "Browse power-play goals by team and player.";
+
+  $("teamBackButton").hidden=true;
+  $("clearTeamButton").hidden=true;
+
+  $("teamGrid").hidden=false;
+  $("scorerGrid").hidden=true;
+  $("scorerGoals").hidden=true;
+
+  $("scorerGrid").innerHTML="";
+  $("scorerGoals").innerHTML="";
+
+  $("teamGrid").innerHTML=NHL_TEAMS.map(([code,name])=>`
+    <button class="team-card" type="button"
+            data-mode-team="${code}"
+            aria-label="Select ${escapeHTML(name)}">
+      <img
+        src="https://assets.nhle.com/logos/nhl/svg/${code}_light.svg"
+        alt=""
+        loading="lazy">
+      <span>${code}</span>
+    </button>
+  `).join("");
+}
+
+function renderScorers(code) {
+  teamModeLevel="scorers";
+  teamModeTeam=code;
+  teamModeScorer="";
+
+  const scorers=getScorers(code);
+  const total=teamGoals(code).length;
+
+  $("teamModeTitle").textContent=getTeamName(code);
+  $("teamModeSubtitle").textContent=
+    `${total} recorded PP goals · ${scorers.length} scorers`;
+
+  $("teamBackButton").hidden=true;
+  $("clearTeamButton").hidden=false;
+
+  $("teamGrid").hidden=true;
+  $("scorerGrid").hidden=false;
+  $("scorerGoals").hidden=true;
+
+  $("scorerGoals").innerHTML="";
+
+  if (!scorers.length) {
+    $("scorerGrid").innerHTML=`
+      <div class="empty" style="grid-column:1/-1">
+        <strong>NO SCORERS AVAILABLE</strong>
+        <p>No power-play goals are recorded for this team yet.</p>
+      </div>`;
+    return;
+  }
+
+  $("scorerGrid").innerHTML=scorers.map(scorer=>{
+    const headshot=headshotCache.get(`${code}|${scorer.key}`);
+    const fallback="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg";
+
+    return `
+      <button type="button"
+        class="scorer-card"
+        data-mode-scorer="${escapeHTML(scorer.key)}">
+        <img class="scorer-headshot"
+          src="${escapeHTML(headshot || fallback)}"
+          alt="${escapeHTML(scorer.name)}"
+          loading="lazy"
+          onerror="this.onerror=null;this.src='${fallback}'">
+        <span class="scorer-name">${escapeHTML(scorer.name)}</span>
+        <span class="scorer-count">
+          ${scorer.goals.length}
+          PP ${scorer.goals.length===1?"Goal":"Goals"}
+        </span>
+      </button>
+    `;
+  }).join("");
+}
+
+function renderScorerGoals(code,key) {
+  const scorer=getScorers(code).find(s=>s.key===key);
+  if (!scorer) return;
+
+  teamModeLevel="goals";
+  teamModeScorer=key;
+
+  $("teamModeTitle").textContent=scorer.name;
+  $("teamModeSubtitle").textContent=
+    `${getTeamName(code)} · ${scorer.goals.length} recorded PP goals`;
+
+  $("teamBackButton").hidden=false;
+  $("teamBackButton").textContent="Back to Players";
+  $("clearTeamButton").hidden=false;
+
+  $("teamGrid").hidden=true;
+  $("scorerGrid").hidden=true;
+  $("scorerGoals").hidden=false;
+
+  const goals=[...scorer.goals].sort((a,b)=>
+    String(b.game_date || "").localeCompare(String(a.game_date || ""))
+  );
+
+  $("scorerGoals").innerHTML=goals.map((row,index)=>{
+    const date=formatDate(row.game_date);
+    const opponent=row.pk_team || "Unknown opponent";
+
+    return `
+      <div class="goal-card">
+        <div class="goal-details">
+          <div class="goal-date">
+            ${escapeHTML(date.main)} ${escapeHTML(date.year)}
+          </div>
+          <div class="goal-opponent">
+            vs ${escapeHTML(opponent)}
+            ${row.period ? " · Period "+escapeHTML(row.period) : ""}
+            ${row.time_in_period ? " · "+escapeHTML(row.time_in_period) : ""}
+          </div>
+        </div>
+        ${row.videoUrl ? `
+          <button class="watch-button"
+            type="button"
+            data-goal-index="${index}">
+            ▶ WATCH
+          </button>
+        ` : `<span class="goal-opponent">Unavailable</span>`}
+      </div>
+    `;
+  }).join("");
+}
+
+function setMode(enabled) {
+  teamModeEnabled=enabled;
+
+  $("videoLibrary").style.display=enabled?"none":"";
+  $("teamMode").classList.toggle("active",enabled);
+  $("modeButton").classList.toggle("active",enabled);
+  $("modeButton").textContent=enabled?"Video Library":"Team Mode";
+
+  if (enabled) renderTeams();
 }
 
 /* EVENTS */
@@ -870,12 +1658,14 @@ $("clips").addEventListener("error",e=>{
 
 $("clips").addEventListener("click",e=>{
   const team=e.target.closest("[data-team]");
+
   if (team) {
     selectTeam(team.dataset.team);
     return;
   }
 
   const play=e.target.closest("[data-play]");
+
   if (play) {
     const row=filteredClips[Number(play.dataset.play)];
     if (row) openVideo(row.videoUrl);
@@ -883,6 +1673,7 @@ $("clips").addEventListener("click",e=>{
   }
 
   const save=e.target.closest("[data-save]");
+
   if (save) {
     const row=filteredClips[Number(save.dataset.save)];
     if (row) toggleSaved(row);
@@ -933,14 +1724,18 @@ $("nextPage").addEventListener("click",()=>{
 });
 
 $("closeVideo").addEventListener("click",closeVideo);
+
 $("videoModal").addEventListener("click",e=>{
   if (e.target===$("videoModal")) closeVideo();
 });
+
 document.addEventListener("keydown",e=>{
   if (e.key==="Escape") closeVideo();
+
   if (e.key==="Tab" && $("videoModal").classList.contains("open")) {
     const focusable=[$("closeVideo"),$("clipPlayer")];
     const index=focusable.indexOf(document.activeElement);
+
     if (e.shiftKey && index<=0) {
       e.preventDefault();
       focusable[1].focus();
@@ -949,6 +1744,55 @@ document.addEventListener("keydown",e=>{
       focusable[0].focus();
     }
   }
+});
+
+$("modeButton").addEventListener("click",()=>{
+  setMode(!teamModeEnabled);
+});
+
+$("teamGrid").addEventListener("click",e=>{
+  const button=e.target.closest("[data-mode-team]");
+  if (!button) return;
+
+  const code=button.dataset.modeTeam;
+  renderScorers(code);
+  resolveHeadshots(code);
+});
+
+$("scorerGrid").addEventListener("click",e=>{
+  const button=e.target.closest("[data-mode-scorer]");
+  if (!button) return;
+
+  renderScorerGoals(teamModeTeam,button.dataset.modeScorer);
+});
+
+$("scorerGoals").addEventListener("click",e=>{
+  const button=e.target.closest("[data-goal-index]");
+  if (!button) return;
+
+  const scorer=getScorers(teamModeTeam)
+    .find(s=>s.key===teamModeScorer);
+
+  if (!scorer) return;
+
+  const goals=[...scorer.goals].sort((a,b)=>
+    String(b.game_date || "").localeCompare(String(a.game_date || ""))
+  );
+
+  const row=goals[Number(button.dataset.goalIndex)];
+  if (row) openVideo(row.videoUrl);
+});
+
+$("teamBackButton").addEventListener("click",()=>{
+  if (teamModeLevel==="goals") {
+    renderScorers(teamModeTeam);
+  } else {
+    renderTeams();
+  }
+});
+
+$("clearTeamButton").addEventListener("click",()=>{
+  renderTeams();
 });
 
 /* LOAD CSV */
@@ -974,14 +1818,19 @@ async function loadClips() {
       const row=Object.fromEntries(
         headers.map((h,i)=>[h,(values[i] || "").trim()])
       );
-      row.pk_team=row.pk_team || getOpponentTeam(row.matchup,row.team);
+
+      row.pk_team=row.pk_team ||
+        getOpponentTeam(row.matchup,row.team);
+
       row.videoUrl=getClipUrl(row);
+
       return row;
     });
 
     applyFilters();
   } catch(e) {
     $("resultCount").textContent="Unable to load clips";
+
     $("clips").innerHTML=`
       <tr><td colspan="5">
         <div class="empty">
@@ -989,6 +1838,7 @@ async function loadClips() {
           <p>Check that pp_goal_clips.csv is beside index.html.</p>
         </div>
       </td></tr>`;
+
     $("pageInfo").textContent="Unavailable";
     $("previousPage").disabled=true;
     $("nextPage").disabled=true;
@@ -998,4 +1848,4 @@ async function loadClips() {
 loadClips();
 </script>
 </body>
-</html
+</html>
