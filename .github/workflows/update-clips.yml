@@ -3,7 +3,12 @@ name: Update NHL Power Play Clips
 
 on:
   schedule:
-    - cron: "0 5 * * *"
+    # 6:40 PM Toronto time, every day
+    - cron: "40 18 * * *"
+      timezone: "America/Toronto"
+
+    # 5:07 AM Toronto time, every day
+    - cron: "7 5 * * *"
       timezone: "America/Toronto"
 
   workflow_dispatch:
@@ -11,20 +16,109 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: nhl-pp-goal-clips
+  cancel-in-progress: false
+
 jobs:
   update-clips:
+    name: NHL Power Play Full Data Sweep
     runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    env:
+      TZ: America/Toronto
+      R_LIBS_USER: ${{ github.workspace }}/.r-library
 
     steps:
+
+      # ==========================================
+      # 1. CHECKOUT
+      # ==========================================
+
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      # ==========================================
+      # 2. LOG SCHEDULE AND RUN INFORMATION
+      # ==========================================
+
+      - name: Log execution information
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          set -euo pipefail
+
+          echo "========================================"
+          echo "NHL POWER PLAY CLIPS - AUTOMATED SWEEP"
+          echo "========================================"
+
+          echo "Workflow: $GITHUB_WORKFLOW"
+          echo "Run ID: $GITHUB_RUN_ID"
+          echo "Run Number: $GITHUB_RUN_NUMBER"
+          echo "Event: $EVENT_NAME"
+          echo "Schedule: ${EVENT_SCHEDULE:-manual}"
+          echo "Branch: $GITHUB_REF_NAME"
+          echo "Commit: $GITHUB_SHA"
+
+          echo "UTC time:"
+          date -u '+%Y-%m-%d %H:%M:%S %Z'
+
+          echo "Toronto time:"
+          TZ=America/Toronto date '+%Y-%m-%d %H:%M:%S %Z'
+
+          echo "========================================"
+
+      # ==========================================
+      # 3. VERIFY REPOSITORY STRUCTURE
+      # ==========================================
+
+      - name: Verify required files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Checking repository structure..."
+
+          test -f get_ppGoals_URL.R
+          test -f video_processing.R
+
+          mkdir -p videos
+          mkdir -p logs
+
+          echo "Required scripts found."
+
+          echo "Repository root:"
+          ls -lah
+
+          echo "Video directory:"
+          ls -lah videos | head -30
+
+      # ==========================================
+      # 4. SET UP R
+      # ==========================================
 
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      # ==========================================
+      # 5. INSTALL SYSTEM DEPENDENCIES
+      # ==========================================
 
       - name: Install system dependencies
+        shell: bash
         run: |
+          set -euo pipefail
+
           sudo apt-get update
+
           sudo apt-get install -y \
             libcurl4-openssl-dev \
             libssl-dev \
@@ -32,20 +126,412 @@ jobs:
             ffmpeg \
             yt-dlp
 
+          echo "Checking installed tools..."
+
+          Rscript --version
+          ffmpeg -version | head -1
+          ffprobe -version | head -1
+          yt-dlp --version
+
+      # ==========================================
+      # 6. INSTALL R PACKAGES
+      # ==========================================
+
       - name: Install R packages
+        shell: bash
         run: |
-          Rscript -e 'install.packages(c("curl", "httr2", "jsonlite"), repos="https://cloud.r-project.org")'
+          set -euo pipefail
+
+          mkdir -p "$R_LIBS_USER"
+
+          Rscript -e '
+            packages <- c(
+              "curl",
+              "httr2",
+              "jsonlite"
+            )
+
+            missing <- packages[
+              !vapply(
+                packages,
+                requireNamespace,
+                logical(1),
+                quietly = TRUE
+              )
+            ]
+
+            if (length(missing) > 0) {
+              install.packages(
+                missing,
+                repos = "https://cloud.r-project.org"
+              )
+            }
+
+            for (pkg in packages) {
+              stopifnot(
+                requireNamespace(pkg, quietly = TRUE)
+              )
+              cat("Verified:", pkg, "\n")
+            }
+          '
+
+      # ==========================================
+      # 7. INITIAL FILE INVENTORY
+      # ==========================================
+
+      - name: Record initial database state
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Recording initial repository state..."
+
+          if [ -f pp_goal_clips.csv ]; then
+            echo "CSV exists."
+            wc -l pp_goal_clips.csv
+            sha256sum pp_goal_clips.csv
+          else
+            echo "No existing CSV."
+          fi
+
+          echo "Existing MP4 files:"
+          find videos -type f -iname '*.mp4' | wc -l
+
+          echo "Current Git status:"
+          git status --short
+
+      # ==========================================
+      # 8. COLLECT NHL POWER-PLAY GOALS
+      # ==========================================
 
       - name: Collect NHL power-play goals
+        shell: bash
         run: |
-          Rscript get_ppGoals_URL.R
+          set -euo pipefail
+
+          echo "Starting NHL data collection..."
+
+          success=0
+
+          for attempt in 1 2 3; do
+
+            echo "Collection attempt: $attempt"
+
+            if timeout 1200 \
+              Rscript get_ppGoals_URL.R; then
+
+              success=1
+              break
+
+            fi
+
+            echo "Attempt $attempt failed."
+
+            if [ "$attempt" -lt 3 ]; then
+              sleep 60
+            fi
+
+          done
+
+          if [ "$success" -ne 1 ]; then
+            echo "::error::All NHL collection attempts failed."
+            exit 1
+          fi
+
+          echo "NHL collection completed."
+
+      # ==========================================
+      # 9. VALIDATE CSV DATABASE
+      # ==========================================
+
+      - name: Validate CSV database
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 - <<'PY'
+          import csv
+          import os
+          import hashlib
+
+          path = "pp_goal_clips.csv"
+
+          if not os.path.exists(path):
+              raise SystemExit("ERROR: CSV missing")
+
+          if os.path.getsize(path) == 0:
+              raise SystemExit("ERROR: CSV empty")
+
+          with open(
+              path,
+              newline="",
+              encoding="utf-8-sig"
+          ) as f:
+              reader = csv.DictReader(f)
+              headers = reader.fieldnames
+              rows = list(reader)
+
+          if not headers:
+              raise SystemExit("ERROR: Missing headers")
+
+          if len(headers) != len(set(headers)):
+              raise SystemExit("ERROR: Duplicate headers")
+
+          if not rows:
+              raise SystemExit("ERROR: No database records")
+
+          if any(None in row for row in rows):
+              raise SystemExit("ERROR: Malformed CSV rows")
+
+          blank_rows = sum(
+              all(not str(v or "").strip()
+                  for v in row.values())
+              for row in rows
+          )
+
+          if blank_rows:
+              raise SystemExit(
+                  f"ERROR: {blank_rows} blank rows"
+              )
+
+          with open(path, "rb") as f:
+              checksum = hashlib.sha256(
+                  f.read()
+              ).hexdigest()
+
+          print("CSV validation passed.")
+          print("Records:", len(rows))
+          print("Columns:", len(headers))
+          print("Headers:", ", ".join(headers))
+          print("SHA256:", checksum)
+          PY
+
+      # ==========================================
+      # 10. PROCESS VIDEO CLIPS
+      # ==========================================
 
       - name: Download and process MP4 videos
+        shell: bash
         run: |
-          Rscript video_processing.R
+          set -euo pipefail
 
-      - name: Save CSV and MP4 files to GitHub
+          echo "Starting video processing..."
+
+          timeout 2700 \
+            Rscript video_processing.R
+
+          echo "Video processing completed."
+
+      # ==========================================
+      # 11. FULL VIDEO FILE SWEEP
+      # ==========================================
+
+      - name: Inspect every MP4 file
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 - <<'PY'
+          import os
+          import subprocess
+
+          video_root = "videos"
+          files = []
+
+          for root, _, names in os.walk(video_root):
+              for name in names:
+                  if name.lower().endswith(".mp4"):
+                      files.append(
+                          os.path.join(root, name)
+                      )
+
+          files.sort()
+
+          invalid = []
+          total_bytes = 0
+
+          for path in files:
+
+              size = os.path.getsize(path)
+              total_bytes += size
+
+              if size == 0:
+                  invalid.append(
+                      (path, "Zero-byte file")
+                  )
+                  continue
+
+              try:
+                  result = subprocess.run(
+                      [
+                          "ffprobe",
+                          "-v", "error",
+                          "-select_streams", "v:0",
+                          "-show_entries",
+                          "stream=codec_name,width,height",
+                          "-of", "json",
+                          path
+                      ],
+                      capture_output=True,
+                      text=True,
+                      timeout=30
+                  )
+
+                  if result.returncode != 0:
+                      invalid.append(
+                          (path, "ffprobe failed")
+                      )
+                      continue
+
+                  import json
+                  data = json.loads(result.stdout)
+
+                  if not data.get("streams"):
+                      invalid.append(
+                          (path, "Missing video stream")
+                      )
+
+              except Exception as exc:
+                  invalid.append(
+                      (path, str(exc))
+                  )
+
+          print("================================")
+          print("VIDEO INTEGRITY REPORT")
+          print("================================")
+          print("Files inspected:", len(files))
+          print("Total bytes:", total_bytes)
+          print("Invalid files:", len(invalid))
+
+          for path, reason in invalid:
+              print("INVALID:", path, reason)
+
+          if invalid:
+              raise SystemExit(
+                  "MP4 integrity validation failed"
+              )
+
+          print("Video inspection passed.")
+          PY
+
+      # ==========================================
+      # 12. FINAL REPOSITORY INSPECTION
+      # ==========================================
+
+      - name: Final data inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Final CSV:"
+          ls -lh pp_goal_clips.csv
+
+          echo "CSV row count:"
+          wc -l pp_goal_clips.csv
+
+          echo "Final MP4 count:"
+          find videos -type f -iname '*.mp4' | wc -l
+
+          echo "Video storage:"
+          du -sh videos
+
+          echo "Changed files:"
+          git status --short
+
+          echo "Change summary:"
+          git diff --stat
+
+      # ==========================================
+      # 13. SAVE UPDATED DATA
+      # ==========================================
+
+      - name: Commit CSV and MP4 files
+        id: commit
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Update NHL power-play clips and videos"
+          commit_message: "Automated NHL PP clips update"
           file_pattern: "pp_goal_clips.csv videos/**"
+
+      # ==========================================
+      # 14. VERIFY COMMIT
+      # ==========================================
+
+      - name: Verify saved changes
+        shell: bash
+        env:
+          CHANGES_DETECTED: ${{ steps.commit.outputs.changes_detected }}
+          COMMIT_HASH: ${{ steps.commit.outputs.commit_hash }}
+        run: |
+          set -euo pipefail
+
+          echo "Changes detected: $CHANGES_DETECTED"
+
+          if [ "$CHANGES_DETECTED" = "true" ]; then
+            echo "New commit: $COMMIT_HASH"
+          else
+            echo "No new data changes to commit."
+          fi
+
+          git status --short
+
+      # ==========================================
+      # 15. SAVE DIAGNOSTIC LOGS
+      # ==========================================
+
+      - name: Upload diagnostic logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nhl-pp-sweep-${{ github.run_id }}
+          path: |
+            logs/
+          if-no-files-found: ignore
+          retention-days: 30
+
+      # ==========================================
+      # 16. GITHUB ACTIONS SUMMARY
+      # ==========================================
+
+      - name: Publish sweep summary
+        if: always()
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_SCHEDULE: ${{ github.event.schedule }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          {
+            echo "# NHL Power Play Clips"
+            echo ""
+            echo "## Automated Data Sweep"
+            echo ""
+            echo "| Item | Result |"
+            echo "|---|---|"
+            echo "| Run | $GITHUB_RUN_NUMBER |"
+            echo "| Event | $EVENT_NAME |"
+            echo "| Cron | ${EVENT_SCHEDULE:-manual} |"
+            echo "| Status | $JOB_STATUS |"
+            echo "| Branch | $GITHUB_REF_NAME |"
+            echo "| UTC | $(date -u) |"
+            echo "| Toronto | $(TZ=America/Toronto date) |"
+
+            if [ -f pp_goal_clips.csv ]; then
+              echo "| CSV | Present |"
+              echo "| CSV lines | $(wc -l < pp_goal_clips.csv) |"
+            else
+              echo "| CSV | Missing |"
+            fi
+
+            if [ -d videos ]; then
+              count=$(find videos -type f -iname '*.mp4' | wc -l)
+              echo "| MP4 files | $count |"
+            fi
+
+            echo ""
+            echo "### Repository changes"
+            echo ""
+            echo '```'
+            git status --short
+            echo '```'
+
+          } >> "$GITHUB_STEP_SUMMARY"
