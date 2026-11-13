@@ -3,12 +3,8 @@ name: Update NHL Power Play Clips
 
 on:
   schedule:
-    # 6:40 PM Toronto time, every day
-    - cron: "40 18 * * *"
-      timezone: "America/Toronto"
-
-    # 5:07 AM Toronto time, every day
-    - cron: "7 5 * * *"
+    # 2:00 AM Toronto time, every day
+    - cron: "0 2 * * *"
       timezone: "America/Toronto"
 
   workflow_dispatch:
